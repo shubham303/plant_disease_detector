@@ -8,6 +8,8 @@ A Flutter mobile application that helps users identify plant diseases by taking 
 - **Image Analysis**: Send images to backend service for plant disease identification
 - **Markdown Display**: View detailed analysis results in formatted markdown
 - **User-Friendly UI**: Clean, intuitive interface with loading states and error handling
+- **Google Sign-In**: Secure authentication using Google accounts for personalized experience
+- **Payment Subscription Integration**: Premium subscription plans with integrated payment processing
 
 ## Getting Started
 
