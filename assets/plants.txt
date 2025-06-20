@@ -1,0 +1,85 @@
+Apple
+Banana
+Cherry
+Corn
+Grape
+Peach
+Pepper
+Potato
+Strawberry
+Tomato
+Rose
+Sunflower
+Tulip
+Lily
+Orchid
+Mint
+Basil
+Rosemary
+Thyme
+Parsley
+Aloe Vera
+Snake Plant
+Peace Lily
+Rubber Plant
+Fiddle Leaf Fig
+Monstera
+Pothos
+Philodendron
+Spider Plant
+ZZ Plant
+Cactus
+Succulent
+Fern
+Bamboo
+Palm
+Jade Plant
+String of Pearls
+Christmas Cactus
+African Violet
+Begonia
+Geranium
+Marigold
+Petunia
+Zinnia
+Lavender
+Sage
+Oregano
+Cilantro
+Chives
+Dill
+Lettuce
+Spinach
+Kale
+Broccoli
+Cauliflower
+Cabbage
+Carrot
+Radish
+Onion
+Garlic
+Cucumber
+Zucchini
+Pumpkin
+Squash
+Eggplant
+Okra
+Green Bean
+Pea
+Lemon
+Orange
+Lime
+Grapefruit
+Avocado
+Mango
+Papaya
+Pineapple
+Coconut
+Fig
+Pomegranate
+Blueberry
+Raspberry
+Blackberry
+Watermelon
+Cantaloupe
+Honeydew
