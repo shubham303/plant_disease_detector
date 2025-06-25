@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import '../services/plant_analysis_service.dart';
+import 'image_picker_widget.dart';
 
 class PlantScanWidget extends StatefulWidget {
   final String? plantType; // If null, will show plant type selection
@@ -22,7 +23,6 @@ class PlantScanWidget extends StatefulWidget {
 }
 
 class _PlantScanWidgetState extends State<PlantScanWidget> {
-  final ImagePicker _picker = ImagePicker();
   final TextEditingController _descriptionController = TextEditingController();
   
   List<File> _selectedImages = [];
@@ -37,187 +37,21 @@ class _PlantScanWidgetState extends State<PlantScanWidget> {
   }
 
   void _showImageSourceDialog() {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Add Plant Images',
-              style: GoogleFonts.inter(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildImageSourceOption(
-                    icon: Icons.camera_alt_rounded,
-                    label: 'Camera',
-                    onTap: () {
-                      Navigator.pop(context);
-                      _pickFromCamera();
-                    },
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildImageSourceOption(
-                    icon: Icons.photo_library_rounded,
-                    label: 'Gallery',
-                    onTap: () {
-                      Navigator.pop(context);
-                      _pickFromGallery();
-                    },
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-          ],
-        ),
-      ),
+    ImagePickerWidget.show(
+      context,
+      onImagesSelected: _onImagesSelected,
+      title: 'Add Plant Images',
+      allowMultiple: true,
     );
   }
 
-  Widget _buildImageSourceOption({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.grey[50],
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey[200]!),
-        ),
-        child: Column(
-          children: [
-            Icon(icon, size: 32, color: const Color(0xFF2E7D32)),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              style: GoogleFonts.inter(
-                fontWeight: FontWeight.w500,
-                color: Colors.grey[700],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _pickFromCamera() async {
-    try {
-      final XFile? image = await _picker.pickImage(
-        source: ImageSource.camera,
-        maxWidth: 1024,
-        maxHeight: 1024,
-        imageQuality: 85,
-      );
-      
-      if (image != null) {
-        setState(() {
-          _selectedXFiles.add(image);
-          if (!kIsWeb) {
-            _selectedImages.add(File(image.path));
-          }
-        });
-        
-        // Ask user if they want to add more photos
-        _showAddMoreDialog();
+  void _onImagesSelected(List<XFile> images) {
+    setState(() {
+      _selectedXFiles.addAll(images);
+      if (!kIsWeb) {
+        _selectedImages.addAll(images.map((xfile) => File(xfile.path)));
       }
-    } catch (e) {
-      _showErrorDialog('Failed to capture image: $e');
-    }
-  }
-
-  Future<void> _pickFromGallery() async {
-    try {
-      final List<XFile> images = await _picker.pickMultiImage(
-        maxWidth: 1024,
-        maxHeight: 1024,
-        imageQuality: 85,
-      );
-      
-      if (images.isNotEmpty) {
-        setState(() {
-          _selectedXFiles.addAll(images);
-          if (!kIsWeb) {
-            _selectedImages.addAll(images.map((xfile) => File(xfile.path)));
-          }
-        });
-      }
-    } catch (e) {
-      _showErrorDialog('Failed to select images: $e');
-    }
-  }
-
-  void _showAddMoreDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          'Add More Photos?',
-          style: GoogleFonts.inter(fontWeight: FontWeight.w600),
-        ),
-        content: Text(
-          'Would you like to take another photo or select from gallery?',
-          style: GoogleFonts.inter(),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(
-              'Done',
-              style: GoogleFonts.inter(color: Colors.grey[600]),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _pickFromCamera();
-            },
-            child: Text(
-              'Camera',
-              style: GoogleFonts.inter(color: const Color(0xFF2E7D32)),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _pickFromGallery();
-            },
-            child: Text(
-              'Gallery',
-              style: GoogleFonts.inter(color: const Color(0xFF2E7D32)),
-            ),
-          ),
-        ],
-      ),
-    );
+    });
   }
 
   void _removeImage(int index) {

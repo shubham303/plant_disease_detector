@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../models/plant.dart';
 import '../widgets/plant_scan_widget.dart';
-import 'plant_chat_screen.dart';
+import '../utils/navigation_utils.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -43,40 +42,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
 
 
-  void _showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('Error', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
-        content: Text(message, style: GoogleFonts.inter()),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
-  }
 
 
   void _openGeneralChatbot() {
-    // Create a generic plant for general chat
-    final generalPlant = Plant(
-      id: 'general_chat',
-      name: 'General Plant Care',
-      plantType: 'General',
-      imagePaths: [],
-      dateAdded: DateTime.now(),
-    );
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PlantChatScreen(plant: generalPlant),
-      ),
-    );
+    NavigationUtils.openGeneralPlantChat(context);
   }
 
   @override

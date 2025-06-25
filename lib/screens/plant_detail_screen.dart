@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../models/plant.dart';
 import '../services/plant_service.dart';
 import '../widgets/plant_scan_widget.dart';
-import 'plant_chat_screen.dart';
+import '../utils/navigation_utils.dart';
 
 class PlantDetailScreen extends StatefulWidget {
   final Plant plant;
@@ -346,12 +346,7 @@ class _PlantDetailScreenState extends State<PlantDetailScreen>
             actions: [
               IconButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PlantChatScreen(plant: _currentPlant),
-                    ),
-                  );
+                  NavigationUtils.openPlantChat(context, _currentPlant);
                 },
                 icon: Container(
                   padding: const EdgeInsets.all(8),
@@ -549,12 +544,7 @@ class _PlantDetailScreenState extends State<PlantDetailScreen>
       floatingActionButton: FloatingActionButton(
         heroTag: "plant_chat_fab",
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => PlantChatScreen(plant: _currentPlant),
-            ),
-          );
+          NavigationUtils.openPlantChat(context, _currentPlant);
         },
         backgroundColor: const Color(0xFF2E7D32),
         foregroundColor: Colors.white,

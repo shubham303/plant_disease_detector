@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:uuid/uuid.dart';
+import '../widgets/image_picker_widget.dart';
 import '../models/chat_message.dart';
 import '../services/chat_service.dart';
 
@@ -213,65 +214,35 @@ class _ChatHomeScreenState extends State<ChatHomeScreen> with TickerProviderStat
   }
 
   void _showImageSourceDialog() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: const Color(0xFFFFFDF7),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: const Color(0xFFE8E8E8),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Add Image',
-              style: GoogleFonts.inter(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF2D2D2D),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildImageSourceOption(
-                    icon: Icons.camera_alt_rounded,
-                    label: 'Camera',
-                    onTap: () {
-                      Navigator.pop(context);
-                      _pickFromCamera();
-                    },
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _buildImageSourceOption(
-                    icon: Icons.photo_library_rounded,
-                    label: 'Gallery',
-                    onTap: () {
-                      Navigator.pop(context);
-                      _pickFromGallery();
-                    },
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-          ],
-        ),
-      ),
+    ImagePickerWidget.show(
+      context,
+      onImagesSelected: _onImageSelected,
+      title: 'Add Image',
+      allowMultiple: false, // Chat typically uses single images
     );
+  }
+
+  void _onImageSelected(List<XFile> images) {
+    if (images.isNotEmpty) {
+      final image = images.first;
+      setState(() {
+        if (kIsWeb) {
+          _selectedWebImageBytes = null;
+          _selectedImageName = image.name;
+          // Load bytes for preview
+          image.readAsBytes().then((bytes) {
+            setState(() {
+              _selectedWebImageBytes = bytes;
+            });
+          });
+        } else {
+          _selectedImageFile = File(image.path);
+        }
+      });
+      
+      // Focus on text input so user can add a message
+      _focusNode.requestFocus();
+    }
   }
 
   Widget _buildImageSourceOption({

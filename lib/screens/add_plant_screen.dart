@@ -7,6 +7,7 @@ import 'package:uuid/uuid.dart';
 import 'package:path_provider/path_provider.dart';
 import '../models/plant.dart';
 import '../services/plant_service.dart';
+import '../widgets/image_picker_widget.dart';
 
 class AddPlantScreen extends StatefulWidget {
   const AddPlantScreen({super.key});
@@ -179,63 +180,21 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
   }
 
   void _showImageSourceDialog() {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Add Plant Images',
-              style: GoogleFonts.inter(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildImageSourceOption(
-                    icon: Icons.camera_alt_rounded,
-                    label: 'Camera',
-                    onTap: () {
-                      Navigator.pop(context);
-                      _pickFromCamera();
-                    },
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildImageSourceOption(
-                    icon: Icons.photo_library_rounded,
-                    label: 'Gallery',
-                    onTap: () {
-                      Navigator.pop(context);
-                      _pickFromGallery();
-                    },
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-          ],
-        ),
-      ),
+    ImagePickerWidget.show(
+      context,
+      onImagesSelected: _onImagesSelected,
+      title: 'Add Plant Images',
+      allowMultiple: true,
     );
+  }
+
+  void _onImagesSelected(List<XFile> images) {
+    setState(() {
+      _selectedXFiles.addAll(images);
+      if (!kIsWeb) {
+        _selectedImages.addAll(images.map((xfile) => File(xfile.path)));
+      }
+    });
   }
 
   Widget _buildImageSourceOption({
