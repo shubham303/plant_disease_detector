@@ -1,12 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'firebase_options.dart';
 import 'screens/home_screen.dart';
 import 'screens/my_plants_screen.dart';
 import 'screens/notifications_screen.dart';
+import 'screens/auth_screen.dart';
+import 'screens/email_verification_screen.dart';
 import 'services/notification_service.dart';
+import 'services/google_signin_debug.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Firebase
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  
+  // Run Google Sign-In diagnostics in debug mode
+  await GoogleSignInDebug.runDiagnostics();
+  GoogleSignInDebug.logGoogleSignInConfig();
+  
   // Initialize sample notifications
   await NotificationService.initializeSampleNotifications();
   runApp(const PlantDiseaseApp());
@@ -56,7 +72,34 @@ class PlantDiseaseApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const MainScreen(),
+      home: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+          
+          if (snapshot.hasData) {
+            final user = snapshot.data!;
+            
+            // Check if user signed in with email/password and if email is verified
+            final isEmailPasswordUser = user.providerData.any(
+              (provider) => provider.providerId == 'password',
+            );
+            
+            // If user signed in with email/password but email is not verified, show verification screen
+            if (isEmailPasswordUser && !user.emailVerified) {
+              return const EmailVerificationScreen();
+            }
+            
+            return const MainScreen();
+          } else {
+            return const AuthScreen();
+          }
+        },
+      ),
     );
   }
 }

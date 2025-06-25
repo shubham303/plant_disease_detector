@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "161668050947",
+    "project_id": "plant-care-app-e2fe9",
+    "storage_bucket": "plant-care-app-e2fe9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:161668050947:android:e9d52619febff9e309de36",
+        "android_client_info": {
+          "package_name": "com.example.plant_disease_detector"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "161668050947-dstedotm9v3necq76u3e26p3a2i0tu5h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.plant_disease_detector",
+            "certificate_hash": "6aad4316821e41443c2166bbcf599c322416c87f"
+          }
+        },
+        {
+          "client_id": "161668050947-e0fju57l69q4cupmp0irmv85qaskf81h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDPiLEfDvKdm09zFtwb9MHNnAPMwNbU5_M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "161668050947-e0fju57l69q4cupmp0irmv85qaskf81h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

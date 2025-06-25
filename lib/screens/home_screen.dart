@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../widgets/plant_scan_widget.dart';
 import '../utils/navigation_utils.dart';
+import 'profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -60,6 +62,27 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         backgroundColor: const Color(0xFF2E7D32),
         foregroundColor: Colors.white,
         elevation: 0,
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfileScreen()),
+              );
+            },
+            icon: CircleAvatar(
+              radius: 16,
+              backgroundImage: FirebaseAuth.instance.currentUser?.photoURL != null
+                  ? NetworkImage(FirebaseAuth.instance.currentUser!.photoURL!)
+                  : null,
+              backgroundColor: Colors.white.withOpacity(0.2),
+              child: FirebaseAuth.instance.currentUser?.photoURL == null
+                  ? const Icon(Icons.person, size: 20, color: Colors.white)
+                  : null,
+            ),
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: FadeTransition(
         opacity: _fadeAnimation,
