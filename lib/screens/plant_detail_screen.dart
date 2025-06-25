@@ -23,10 +23,12 @@ class _PlantDetailScreenState extends State<PlantDetailScreen>
   bool _isLoading = true;
   final TextEditingController _careEntryController = TextEditingController();
   DateTime _selectedCareDate = DateTime.now();
+  late Plant _currentPlant;
 
   @override
   void initState() {
     super.initState();
+    _currentPlant = widget.plant;
     _tabController = TabController(length: 3, vsync: this);
     _loadCareGuide();
   }
@@ -41,7 +43,7 @@ class _PlantDetailScreenState extends State<PlantDetailScreen>
   Future<void> _loadCareGuide() async {
     setState(() => _isLoading = true);
     try {
-      final guide = PlantService.getPlantCareGuide(widget.plant.name);
+      final guide = PlantService.getPlantCareGuide(_currentPlant.name);
       setState(() {
         _careGuide = guide;
         _isLoading = false;
@@ -284,14 +286,14 @@ class _PlantDetailScreenState extends State<PlantDetailScreen>
     final formattedEntry = '${_selectedCareDate.day}/${_selectedCareDate.month}/${_selectedCareDate.year} - $entry';
 
     try {
-      final updatedPlant = widget.plant.copyWith(
-        careHistory: [...widget.plant.careHistory, formattedEntry],
+      final updatedPlant = _currentPlant.copyWith(
+        careHistory: [..._currentPlant.careHistory, formattedEntry],
       );
       
       await PlantService.updatePlant(updatedPlant);
       
       setState(() {
-        // Force rebuild to show new entry
+        _currentPlant = updatedPlant; // Update the current plant state
       });
 
       _careEntryController.clear();
@@ -347,7 +349,7 @@ class _PlantDetailScreenState extends State<PlantDetailScreen>
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => PlantChatScreen(plant: widget.plant),
+                      builder: (context) => PlantChatScreen(plant: _currentPlant),
                     ),
                   );
                 },
@@ -366,7 +368,7 @@ class _PlantDetailScreenState extends State<PlantDetailScreen>
             ],
             flexibleSpace: FlexibleSpaceBar(
               background: Hero(
-                tag: 'plant-${widget.plant.id}',
+                tag: 'plant-${_currentPlant.id}',
                 child: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
@@ -379,7 +381,7 @@ class _PlantDetailScreenState extends State<PlantDetailScreen>
                       end: Alignment.bottomCenter,
                     ),
                   ),
-                  child: widget.plant.imagePaths.isNotEmpty
+                  child: _currentPlant.imagePaths.isNotEmpty
                       ? _buildImageCarousel()
                       : _buildPlantPlaceholder(),
                 ),
@@ -392,7 +394,7 @@ class _PlantDetailScreenState extends State<PlantDetailScreen>
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  widget.plant.name,
+                  _currentPlant.name,
                   style: GoogleFonts.inter(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
@@ -441,17 +443,17 @@ class _PlantDetailScreenState extends State<PlantDetailScreen>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Added ${_formatDate(widget.plant.dateAdded)}',
+                                'Added ${_formatDate(_currentPlant.dateAdded)}',
                                 style: GoogleFonts.inter(
                                   fontSize: 14,
                                   color: Colors.grey[600],
                                 ),
                               ),
-                              if (widget.plant.notes != null &&
-                                  widget.plant.notes!.isNotEmpty) ...[
+                              if (_currentPlant.notes != null &&
+                                  _currentPlant.notes!.isNotEmpty) ...[
                                 const SizedBox(height: 4),
                                 Text(
-                                  widget.plant.notes!,
+                                  _currentPlant.notes!,
                                   style: GoogleFonts.inter(
                                     fontSize: 14,
                                     color: Colors.grey[700],
@@ -550,7 +552,7 @@ class _PlantDetailScreenState extends State<PlantDetailScreen>
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => PlantChatScreen(plant: widget.plant),
+              builder: (context) => PlantChatScreen(plant: _currentPlant),
             ),
           );
         },
@@ -562,9 +564,9 @@ class _PlantDetailScreenState extends State<PlantDetailScreen>
   }
 
   Widget _buildImageCarousel() {
-    if (widget.plant.imagePaths.length == 1) {
+    if (_currentPlant.imagePaths.length == 1) {
       // Single image
-      final imagePath = widget.plant.imagePaths.first;
+      final imagePath = _currentPlant.imagePaths.first;
       return kIsWeb
           ? Image.network(
               imagePath,
@@ -584,9 +586,9 @@ class _PlantDetailScreenState extends State<PlantDetailScreen>
       return Stack(
         children: [
           PageView.builder(
-            itemCount: widget.plant.imagePaths.length,
+            itemCount: _currentPlant.imagePaths.length,
             itemBuilder: (context, index) {
-              final imagePath = widget.plant.imagePaths[index];
+              final imagePath = _currentPlant.imagePaths[index];
               return kIsWeb
                   ? Image.network(
                       imagePath,
@@ -614,7 +616,7 @@ class _PlantDetailScreenState extends State<PlantDetailScreen>
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                '${widget.plant.imagePaths.length} photos',
+                '${_currentPlant.imagePaths.length} photos',
                 style: GoogleFonts.inter(
                   color: Colors.white,
                   fontSize: 12,
@@ -624,7 +626,7 @@ class _PlantDetailScreenState extends State<PlantDetailScreen>
             ),
           ),
           // Swipe indicator dots
-          if (widget.plant.imagePaths.length > 1)
+          if (_currentPlant.imagePaths.length > 1)
             Positioned(
               bottom: 50,
               left: 0,
@@ -632,7 +634,7 @@ class _PlantDetailScreenState extends State<PlantDetailScreen>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(
-                  widget.plant.imagePaths.length,
+                  _currentPlant.imagePaths.length,
                   (index) => Container(
                     margin: const EdgeInsets.symmetric(horizontal: 2),
                     width: 6,
@@ -754,8 +756,8 @@ class _PlantDetailScreenState extends State<PlantDetailScreen>
           Expanded(
             child: SingleChildScrollView(
               child: PlantScanWidget(
-                plantType: widget.plant.plantType,
-                title: 'Analyze ${widget.plant.name}',
+                plantType: _currentPlant.plantType,
+                title: 'Analyze ${_currentPlant.name}',
                 onAnalysisComplete: (result) {
                   // You can handle the analysis result here if needed
                   // For example, save it to plant's care history
@@ -819,7 +821,7 @@ class _PlantDetailScreenState extends State<PlantDetailScreen>
           
           // Care History List
           Expanded(
-            child: widget.plant.careHistory.isEmpty
+            child: _currentPlant.careHistory.isEmpty
                 ? Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -858,7 +860,7 @@ class _PlantDetailScreenState extends State<PlantDetailScreen>
                   )
                 : SingleChildScrollView(
                     child: Column(
-                      children: widget.plant.careHistory.reversed.map((history) {
+                      children: _currentPlant.careHistory.reversed.map((history) {
                         return Container(
                           margin: const EdgeInsets.only(bottom: 12),
                           padding: const EdgeInsets.all(16),
