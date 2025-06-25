@@ -1,11 +1,9 @@
-import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../services/plant_analysis_service.dart';
-import '../services/plant_service.dart';
+import '../models/plant.dart';
+import '../widgets/plant_scan_widget.dart';
+import 'plant_chat_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,20 +13,13 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
-  File? _selectedImage;
-  XFile? _selectedXFile;
   String? _analysisResult;
-  String? _selectedPlantName;
-  bool _isLoading = false;
-  final ImagePicker _picker = ImagePicker();
-  List<String> _supportedPlants = [];
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
-    _loadSupportedPlants();
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
@@ -45,86 +36,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  Future<void> _loadSupportedPlants() async {
-    final plants = await PlantService.getSupportedPlants();
-    setState(() {
-      _supportedPlants = plants;
-    });
-  }
 
-  Future<void> _takePhoto() async {
-    try {
-      final XFile? photo = await _picker.pickImage(
-        source: ImageSource.camera,
-        maxWidth: 1024,
-        maxHeight: 1024,
-        imageQuality: 85,
-      );
-      
-      if (photo != null) {
-        setState(() {
-          _selectedXFile = photo;
-          if (!kIsWeb) {
-            _selectedImage = File(photo.path);
-          }
-          _analysisResult = null;
-        });
-      }
-    } catch (e) {
-      _showErrorDialog('Failed to take photo: $e');
-    }
-  }
 
-  Future<void> _selectFromGallery() async {
-    try {
-      final XFile? image = await _picker.pickImage(
-        source: ImageSource.gallery,
-        maxWidth: 1024,
-        maxHeight: 1024,
-        imageQuality: 85,
-      );
-      
-      if (image != null) {
-        setState(() {
-          _selectedXFile = image;
-          if (!kIsWeb) {
-            _selectedImage = File(image.path);
-          }
-          _analysisResult = null;
-        });
-      }
-    } catch (e) {
-      _showErrorDialog('Failed to select image: $e');
-    }
-  }
 
-  Future<void> _analyzeImage() async {
-    if (_selectedXFile == null && _selectedImage == null) return;
-    if (_selectedPlantName == null || _selectedPlantName!.isEmpty) {
-      _showErrorDialog('Please select a plant name first');
-      return;
-    }
 
-    setState(() {
-      _isLoading = true;
-    });
 
-    try {
-      final result = await PlantAnalysisService.analyzeImage(
-        kIsWeb ? null : _selectedImage!,
-        plantName: _selectedPlantName!,
-      );
-      setState(() {
-        _analysisResult = result;
-      });
-    } catch (e) {
-      _showErrorDialog('Failed to analyze image: $e');
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
+
 
   void _showErrorDialog(String message) {
     showDialog(
@@ -143,14 +60,23 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  void _reset() {
-    setState(() {
-      _selectedImage = null;
-      _selectedXFile = null;
-      _analysisResult = null;
-      _selectedPlantName = null;
-      _isLoading = false;
-    });
+
+  void _openGeneralChatbot() {
+    // Create a generic plant for general chat
+    final generalPlant = Plant(
+      id: 'general_chat',
+      name: 'General Plant Care',
+      plantType: 'General',
+      imagePaths: [],
+      dateAdded: DateTime.now(),
+    );
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PlantChatScreen(plant: generalPlant),
+      ),
+    );
   }
 
   @override
@@ -165,14 +91,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         backgroundColor: const Color(0xFF2E7D32),
         foregroundColor: Colors.white,
         elevation: 0,
-        actions: [
-          if (_selectedImage != null || _selectedXFile != null)
-            IconButton(
-              onPressed: _reset,
-              icon: const Icon(Icons.refresh_rounded),
-              tooltip: 'Reset',
-            ),
-        ],
       ),
       body: FadeTransition(
         opacity: _fadeAnimation,
@@ -182,116 +100,62 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Welcome Card
-              if (_selectedImage == null && _selectedXFile == null) ...[
-                Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF4CAF50), Color(0xFF2E7D32)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF2E7D32).withOpacity(0.3),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Icon(
-                              Icons.local_florist_rounded,
-                              color: Colors.white,
-                              size: 32,
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Analyze Your Plants',
-                                  style: GoogleFonts.inter(
-                                    color: Colors.white,
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  'Get instant disease detection and care advice',
-                                  style: GoogleFonts.inter(
-                                    color: Colors.white.withOpacity(0.9),
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-              ],
-
-              // Image Selection Section
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF4CAF50), Color(0xFF2E7D32)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: const Color(0xFF2E7D32).withOpacity(0.3),
                       blurRadius: 20,
-                      offset: const Offset(0, 5),
+                      offset: const Offset(0, 10),
                     ),
                   ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Capture Plant Image',
-                      style: GoogleFonts.inter(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey[800],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
                     Row(
                       children: [
-                        Expanded(
-                          child: _buildActionButton(
-                            onPressed: _takePhoto,
-                            icon: Icons.camera_alt_rounded,
-                            label: 'Camera',
-                            color: const Color(0xFF2E7D32),
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(
+                            Icons.local_florist_rounded,
+                            color: Colors.white,
+                            size: 32,
                           ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
-                          child: _buildActionButton(
-                            onPressed: _selectFromGallery,
-                            icon: Icons.photo_library_rounded,
-                            label: 'Gallery',
-                            color: const Color(0xFF1976D2),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Analyze Your Plants',
+                                style: GoogleFonts.inter(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Get instant disease detection and care advice',
+                                style: GoogleFonts.inter(
+                                  color: Colors.white.withOpacity(0.9),
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -299,10 +163,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ],
                 ),
               ),
+              const SizedBox(height: 24),
 
-              const SizedBox(height: 20),
-
-              // Plant Selection Dropdown
+              // Action Buttons
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
@@ -320,7 +183,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Select Plant Type',
+                      'What would you like to do?',
                       style: GoogleFonts.inter(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
@@ -328,43 +191,53 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey[300]!),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          value: _selectedPlantName,
-                          hint: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Text(
-                              'Choose your plant...',
-                              style: GoogleFonts.inter(color: Colors.grey[600]),
-                            ),
+                    // Plant Scan Widget
+                    PlantScanWidget(
+                      title: 'Scan Plant',
+                      onAnalysisComplete: (result) {
+                        setState(() {
+                          _analysisResult = result;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    // Chatbot Button
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _openGeneralChatbot,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF1976D2),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 20),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
                           ),
-                          isExpanded: true,
-                          icon: const Padding(
-                            padding: EdgeInsets.only(right: 16),
-                            child: Icon(Icons.keyboard_arrow_down_rounded),
-                          ),
-                          items: _supportedPlants.map((String plant) {
-                            return DropdownMenuItem<String>(
-                              value: plant,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16),
-                                child: Text(
-                                  plant,
-                                  style: GoogleFonts.inter(),
-                                ),
+                          elevation: 3,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                            );
-                          }).toList(),
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              _selectedPlantName = newValue;
-                            });
-                          },
+                              child: const Icon(
+                                Icons.chat_rounded,
+                                size: 24,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              'Ask Plant Expert',
+                              style: GoogleFonts.inter(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -373,145 +246,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
 
               const SizedBox(height: 20),
-
-              // Image Display Section
-              if (_selectedImage != null || _selectedXFile != null) ...[
-                Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 20,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Selected Image',
-                        style: GoogleFonts.inter(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey[800],
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Center(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 5),
-                                ),
-                              ],
-                            ),
-                            child: kIsWeb
-                                ? Image.network(
-                                    _selectedXFile!.path,
-                                    height: 300,
-                                    width: double.infinity,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Container(
-                                        height: 300,
-                                        color: Colors.grey[200],
-                                        child: Center(
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              Icon(
-                                                Icons.image_not_supported_outlined,
-                                                size: 48,
-                                                color: Colors.grey[500],
-                                              ),
-                                              const SizedBox(height: 8),
-                                              Text(
-                                                'Image preview not available on web',
-                                                style: GoogleFonts.inter(
-                                                  color: Colors.grey[600],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  )
-                                : Image.file(
-                                    _selectedImage!,
-                                    height: 300,
-                                    width: double.infinity,
-                                    fit: BoxFit.cover,
-                                  ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: _isLoading ? null : _analyzeImage,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF2E7D32),
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 2,
-                          ),
-                          child: _isLoading
-                              ? Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Text(
-                                      'Analyzing...',
-                                      style: GoogleFonts.inter(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              : Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Icon(Icons.auto_awesome_rounded),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      'Analyze Plant',
-                                      style: GoogleFonts.inter(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20),
-              ],
 
               // Analysis Result Section
               if (_analysisResult != null) ...[

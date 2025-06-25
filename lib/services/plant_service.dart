@@ -28,6 +28,10 @@ class PlantService {
     await _savePlants(plants);
   }
 
+  static Future<void> updatePlant(Plant plant) async {
+    await savePlant(plant); // savePlant already handles updates
+  }
+
   static Future<void> deletePlant(String plantId) async {
     final plants = await getPlants();
     plants.removeWhere((plant) => plant.id == plantId);

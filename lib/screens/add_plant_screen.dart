@@ -17,16 +17,28 @@ class AddPlantScreen extends StatefulWidget {
 
 class _AddPlantScreenState extends State<AddPlantScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
   final _notesController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   
   String? _selectedPlantType;
-  File? _selectedImage;
-  XFile? _selectedXFile;
+  List<File> _selectedImages = [];
+  List<XFile> _selectedXFiles = [];
   List<String> _supportedPlants = [];
+  DateTime? _plantationDate;
+  int? _ageInDays;
+  bool _hasDirectSunlight = true;
+  String _irrigationMethod = 'Manual watering';
   bool _isLoading = false;
   bool _isSaving = false;
+
+  final List<String> _irrigationMethods = [
+    'Manual watering',
+    'Drip irrigation',
+    'Sprinkler system',
+    'Self-watering system',
+    'Bottom watering',
+    'Misting',
+  ];
 
   @override
   void initState() {
@@ -36,7 +48,6 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
 
   @override
   void dispose() {
-    _nameController.dispose();
     _notesController.dispose();
     super.dispose();
   }
@@ -54,10 +65,10 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
     }
   }
 
-  Future<void> _pickImage(ImageSource source) async {
+  Future<void> _pickFromCamera() async {
     try {
       final XFile? image = await _picker.pickImage(
-        source: source,
+        source: ImageSource.camera,
         maxWidth: 1024,
         maxHeight: 1024,
         imageQuality: 85,
@@ -65,14 +76,105 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
       
       if (image != null) {
         setState(() {
-          _selectedXFile = image;
+          _selectedXFiles.add(image);
           if (!kIsWeb) {
-            _selectedImage = File(image.path);
+            _selectedImages.add(File(image.path));
+          }
+        });
+        
+        // Ask user if they want to add more photos
+        _showAddMoreDialog();
+      }
+    } catch (e) {
+      _showErrorDialog('Failed to capture image: $e');
+    }
+  }
+
+  Future<void> _pickFromGallery() async {
+    try {
+      final List<XFile> images = await _picker.pickMultiImage(
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 85,
+      );
+      
+      if (images.isNotEmpty) {
+        setState(() {
+          _selectedXFiles.addAll(images);
+          if (!kIsWeb) {
+            _selectedImages.addAll(images.map((xfile) => File(xfile.path)));
           }
         });
       }
     } catch (e) {
-      _showErrorDialog('Failed to select image: $e');
+      _showErrorDialog('Failed to select images: $e');
+    }
+  }
+
+  void _showAddMoreDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          'Add More Photos?',
+          style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+        ),
+        content: Text(
+          'Would you like to take another photo or select from gallery?',
+          style: GoogleFonts.inter(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              'Done',
+              style: GoogleFonts.inter(color: Colors.grey[600]),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _pickFromCamera();
+            },
+            child: Text(
+              'Camera',
+              style: GoogleFonts.inter(color: const Color(0xFF2E7D32)),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _pickFromGallery();
+            },
+            child: Text(
+              'Gallery',
+              style: GoogleFonts.inter(color: const Color(0xFF2E7D32)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _removeImage(int index) {
+    setState(() {
+      if (index < _selectedXFiles.length) {
+        _selectedXFiles.removeAt(index);
+      }
+      if (!kIsWeb && index < _selectedImages.length) {
+        _selectedImages.removeAt(index);
+      }
+    });
+  }
+
+  void _calculateAge() {
+    if (_plantationDate != null) {
+      final now = DateTime.now();
+      final difference = now.difference(_plantationDate!);
+      setState(() {
+        _ageInDays = difference.inDays;
+      });
     }
   }
 
@@ -97,7 +199,7 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
             ),
             const SizedBox(height: 20),
             Text(
-              'Select Image Source',
+              'Add Plant Images',
               style: GoogleFonts.inter(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -112,18 +214,18 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
                     label: 'Camera',
                     onTap: () {
                       Navigator.pop(context);
-                      _pickImage(ImageSource.camera);
+                      _pickFromCamera();
                     },
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
                 Expanded(
                   child: _buildImageSourceOption(
                     icon: Icons.photo_library_rounded,
                     label: 'Gallery',
                     onTap: () {
                       Navigator.pop(context);
-                      _pickImage(ImageSource.gallery);
+                      _pickFromGallery();
                     },
                   ),
                 ),
@@ -191,19 +293,28 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
     setState(() => _isSaving = true);
 
     try {
-      String imagePath = '';
-      if (_selectedImage != null && !kIsWeb) {
-        imagePath = await _saveImageToLocalStorage(_selectedImage!);
-      } else if (_selectedXFile != null && kIsWeb) {
-        imagePath = _selectedXFile!.path;
+      List<String> imagePaths = [];
+      
+      if (!kIsWeb && _selectedImages.isNotEmpty) {
+        for (File imageFile in _selectedImages) {
+          String savedPath = await _saveImageToLocalStorage(imageFile);
+          imagePaths.add(savedPath);
+        }
+      } else if (kIsWeb && _selectedXFiles.isNotEmpty) {
+        imagePaths = _selectedXFiles.map((xfile) => xfile.path).toList();
       }
 
       final plant = Plant(
         id: const Uuid().v4(),
-        name: _selectedPlantType ?? _nameController.text.trim(),
-        imagePath: imagePath,
+        name: _selectedPlantType!,
+        plantType: _selectedPlantType!,
+        imagePaths: imagePaths,
         dateAdded: DateTime.now(),
+        plantationDate: _plantationDate,
+        ageInDays: _ageInDays,
         notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+        hasDirectSunlight: _hasDirectSunlight,
+        irrigationMethod: _irrigationMethod,
       );
 
       await PlantService.savePlant(plant);
@@ -313,23 +424,8 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
                                   width: 2,
                                 ),
                               ),
-                              child: (_selectedImage != null || _selectedXFile != null)
-                                  ? ClipRRect(
-                                      borderRadius: BorderRadius.circular(14),
-                                      child: kIsWeb
-                                          ? Image.network(
-                                              _selectedXFile!.path,
-                                              fit: BoxFit.cover,
-                                              width: double.infinity,
-                                              errorBuilder: (context, error, stackTrace) =>
-                                                  _buildImagePlaceholder(),
-                                            )
-                                          : Image.file(
-                                              _selectedImage!,
-                                              fit: BoxFit.cover,
-                                              width: double.infinity,
-                                            ),
-                                    )
+                              child: _selectedImages.isNotEmpty || _selectedXFiles.isNotEmpty
+                                  ? _buildImageGrid()
                                   : _buildImagePlaceholder(),
                             ),
                           ),
@@ -389,9 +485,6 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
                               onChanged: (String? newValue) {
                                 setState(() {
                                   _selectedPlantType = newValue;
-                                  if (newValue != null) {
-                                    _nameController.text = newValue;
-                                  }
                                 });
                               },
                               validator: (value) {
@@ -406,65 +499,275 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
                       ),
                     ),
 
+
                     const SizedBox(height: 20),
 
-                    // Custom Name (if different from type)
+                    // Plantation Date and Age
                     Container(
-                      padding: const EdgeInsets.all(24),
+                      padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.05),
-                            blurRadius: 20,
-                            offset: const Offset(0, 5),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
                           ),
                         ],
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.schedule_rounded,
+                                color: const Color(0xFF2E7D32),
+                                size: 20,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Plantation Information',
+                                style: GoogleFonts.inter(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey[800],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          
+                          // Plantation Date
                           Text(
-                            'Plant Name (Optional)',
+                            'When was it planted?',
                             style: GoogleFonts.inter(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.grey[800],
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey[700],
                             ),
                           ),
                           const SizedBox(height: 8),
-                          Text(
-                            'Give your plant a custom name',
-                            style: GoogleFonts.inter(
-                              fontSize: 14,
-                              color: Colors.grey[600],
+                          InkWell(
+                            onTap: () async {
+                              final DateTime? picked = await showDatePicker(
+                                context: context,
+                                initialDate: _plantationDate ?? DateTime.now(),
+                                firstDate: DateTime(2000),
+                                lastDate: DateTime.now(),
+                              );
+                              if (picked != null) {
+                                setState(() {
+                                  _plantationDate = picked;
+                                });
+                                _calculateAge();
+                              }
+                            },
+                            child: Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey[300]!),
+                                borderRadius: BorderRadius.circular(8),
+                                color: Colors.grey[50],
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.calendar_today,
+                                    size: 18,
+                                    color: Colors.grey[600],
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    _plantationDate != null
+                                        ? '${_plantationDate!.day}/${_plantationDate!.month}/${_plantationDate!.year}'
+                                        : 'Select plantation date',
+                                    style: GoogleFonts.inter(
+                                      color: _plantationDate != null
+                                          ? Colors.grey[800]
+                                          : Colors.grey[500],
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  Icon(
+                                    Icons.arrow_drop_down,
+                                    color: Colors.grey[600],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: _nameController,
-                            decoration: InputDecoration(
-                              hintText: 'e.g., My Tomato Plant',
-                              hintStyle: GoogleFonts.inter(color: Colors.grey[500]),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(color: Colors.grey[200]!),
+                          
+                          if (_ageInDays != null) ...[
+                            const SizedBox(height: 12),
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF2E7D32).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: const Color(0xFF2E7D32).withOpacity(0.3),
+                                ),
                               ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(color: Colors.grey[200]!),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(color: Color(0xFF2E7D32)),
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 16,
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.access_time,
+                                    size: 18,
+                                    color: const Color(0xFF2E7D32),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    'Plant age: $_ageInDays days old',
+                                    style: GoogleFonts.inter(
+                                      color: const Color(0xFF2E7D32),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            style: GoogleFonts.inter(),
+                          ],
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // Growing Conditions
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.eco_rounded,
+                                color: const Color(0xFF2E7D32),
+                                size: 20,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Growing Conditions',
+                                style: GoogleFonts.inter(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey[800],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          
+                          // Direct Sunlight
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.orange[50],
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.orange[200]!),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.wb_sunny,
+                                  color: Colors.orange[600],
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    'Gets direct sunlight',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.grey[700],
+                                    ),
+                                  ),
+                                ),
+                                Switch(
+                                  value: _hasDirectSunlight,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _hasDirectSunlight = value;
+                                    });
+                                  },
+                                  activeColor: Colors.orange[600],
+                                ),
+                              ],
+                            ),
+                          ),
+                          
+                          const SizedBox(height: 12),
+                          
+                          // Irrigation Method
+                          Text(
+                            'How do you water this plant?',
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey[700],
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey[300]!),
+                              borderRadius: BorderRadius.circular(8),
+                              color: Colors.grey[50],
+                            ),
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton<String>(
+                                value: _irrigationMethod,
+                                isExpanded: true,
+                                icon: Icon(Icons.arrow_drop_down, color: Colors.grey[600]),
+                                items: _irrigationMethods.map((String method) {
+                                  return DropdownMenuItem<String>(
+                                    value: method,
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.water_drop,
+                                          size: 16,
+                                          color: Colors.blue[600],
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          method,
+                                          style: GoogleFonts.inter(fontSize: 14),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
+                                onChanged: (String? newValue) {
+                                  if (newValue != null) {
+                                    setState(() {
+                                      _irrigationMethod = newValue;
+                                    });
+                                  }
+                                },
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -490,7 +793,7 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Notes (Optional)',
+                            'Additional Notes',
                             style: GoogleFonts.inter(
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
@@ -499,7 +802,7 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Add any special notes about your plant',
+                            'The more details you provide, the better care recommendations you\'ll receive. Include soil type, location, previous treatments, observed symptoms, etc.',
                             style: GoogleFonts.inter(
                               fontSize: 14,
                               color: Colors.grey[600],
@@ -510,7 +813,7 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
                             controller: _notesController,
                             maxLines: 4,
                             decoration: InputDecoration(
-                              hintText: 'e.g., Planted from seed, needs extra water...',
+                              hintText: 'e.g., Planted in sandy soil, receives morning sunlight, recently showed yellow leaves, applied fertilizer last month...',
                               hintStyle: GoogleFonts.inter(color: Colors.grey[500]),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -593,7 +896,7 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
         ),
         const SizedBox(height: 12),
         Text(
-          'Tap to add photo',
+          'Tap to add photos',
           style: GoogleFonts.inter(
             color: Colors.grey[600],
             fontWeight: FontWeight.w500,
@@ -601,13 +904,126 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
         ),
         const SizedBox(height: 4),
         Text(
-          'Camera or Gallery',
+          'Camera, Gallery, or Multiple',
           style: GoogleFonts.inter(
             color: Colors.grey[500],
             fontSize: 12,
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildImageGrid() {
+    return Container(
+      constraints: const BoxConstraints(minHeight: 200),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 8,
+          childAspectRatio: 1,
+        ),
+        itemCount: (_selectedImages.isNotEmpty ? _selectedImages.length : _selectedXFiles.length) + 1,
+        itemBuilder: (context, index) {
+          if (index == (_selectedImages.isNotEmpty ? _selectedImages.length : _selectedXFiles.length)) {
+            // Add more button
+            return GestureDetector(
+              onTap: _showImageSourceDialog,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: Colors.grey[300]!,
+                    width: 2,
+                  ),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.add_rounded,
+                      color: Colors.grey[600],
+                      size: 24,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Add More',
+                      style: GoogleFonts.inter(
+                        color: Colors.grey[600],
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          return Stack(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: kIsWeb
+                      ? Image.network(
+                          _selectedXFiles[index].path,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                          errorBuilder: (context, error, stackTrace) => Container(
+                            color: Colors.grey[200],
+                            child: Icon(
+                              Icons.image_not_supported,
+                              color: Colors.grey[400],
+                            ),
+                          ),
+                        )
+                      : Image.file(
+                          _selectedImages[index],
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                        ),
+                ),
+              ),
+              Positioned(
+                top: 4,
+                right: 4,
+                child: GestureDetector(
+                  onTap: () => _removeImage(index),
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.8),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 16,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 }
