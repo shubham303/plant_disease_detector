@@ -55,9 +55,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: NetworkImage(
-              'https://images.unsplash.com/photo-1497250681960-ef046c08a56e?w=800&auto=format&fit=crop&q=60',
-            ),
+            image: AssetImage('assets/images/plant_background.jpg'),
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
               Colors.white.withOpacity(0.95),
@@ -90,8 +88,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   children: [
                     // Background image
                     Positioned.fill(
-                      child: Image.network(
-                        'https://images.unsplash.com/photo-1516048015710-7a3b4c152378?w=800&auto=format&fit=crop&q=60',
+                      child: Image.asset(
+                        'assets/images/plant_header.jpg',
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
@@ -184,9 +182,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 ),
                                 decoration: BoxDecoration(
                                   image: DecorationImage(
-                                    image: NetworkImage(
-                                      'https://images.unsplash.com/photo-1466781783364-36c955e42a7f?w=800&auto=format&fit=crop&q=60',
-                                    ),
+                                    image: AssetImage('assets/images/plant_hero.jpg'),
                                     fit: BoxFit.cover,
                                   ),
                                   borderRadius: BorderRadius.circular(20),
@@ -450,75 +446,333 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         const SizedBox(height: 24),
                         Container(
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Colors.white,
+                                Colors.white.withOpacity(0.95),
+                              ],
+                            ),
                             borderRadius: BorderRadius.circular(24),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.05),
-                                blurRadius: 20,
-                                offset: const Offset(0, 8),
+                                color: const Color(0xFF5B4FCF).withOpacity(0.1),
+                                blurRadius: 30,
+                                offset: const Offset(0, 10),
                               ),
                             ],
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Padding(
+                              // Header with gradient background
+                              Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                    colors: [
+                                      const Color(0xFF5B4FCF).withOpacity(0.08),
+                                      const Color(0xFF7C6FE8).withOpacity(0.05),
+                                    ],
+                                  ),
+                                  borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(24),
+                                    topRight: Radius.circular(24),
+                                  ),
+                                ),
                                 padding: const EdgeInsets.all(20.0),
                                 child: Row(
                                   children: [
                                     Container(
-                                      padding: const EdgeInsets.all(10),
+                                      padding: const EdgeInsets.all(12),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFF5B4FCF).withOpacity(0.1),
-                                        borderRadius: BorderRadius.circular(12),
+                                        gradient: const LinearGradient(
+                                          colors: [Color(0xFF5B4FCF), Color(0xFF7C6FE8)],
+                                        ),
+                                        borderRadius: BorderRadius.circular(14),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: const Color(0xFF5B4FCF).withOpacity(0.3),
+                                            blurRadius: 8,
+                                            offset: const Offset(0, 4),
+                                          ),
+                                        ],
                                       ),
                                       child: const Icon(
-                                        Icons.analytics_rounded,
-                                        color: Color(0xFF5B4FCF),
-                                        size: 24,
+                                        Icons.eco_rounded,
+                                        color: Colors.white,
+                                        size: 26,
                                       ),
                                     ),
-                                    const SizedBox(width: 12),
-                                    Text(
-                                      'Analysis Results',
-                                      style: context.textTheme.titleMedium?.copyWith(
-                                        fontWeight: FontWeight.w600,
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Plant Health Analysis',
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w700,
+                                              color: const Color(0xFF1A1A1A),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Row(
+                                            children: [
+                                              Container(
+                                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                                decoration: BoxDecoration(
+                                                  color: const Color(0xFF4CAF50).withOpacity(0.1),
+                                                  borderRadius: BorderRadius.circular(12),
+                                                  border: Border.all(
+                                                    color: const Color(0xFF4CAF50).withOpacity(0.3),
+                                                  ),
+                                                ),
+                                                child: Row(
+                                                  children: [
+                                                    const Icon(
+                                                      Icons.check_circle,
+                                                      size: 12,
+                                                      color: Color(0xFF4CAF50),
+                                                    ),
+                                                    const SizedBox(width: 4),
+                                                    Text(
+                                                      'AI Powered',
+                                                      style: GoogleFonts.inter(
+                                                        fontSize: 11,
+                                                        fontWeight: FontWeight.w600,
+                                                        color: const Color(0xFF4CAF50),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    IconButton(
+                                      onPressed: () {
+                                        // Share functionality
+                                      },
+                                      icon: Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF5B4FCF).withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: const Icon(
+                                          Icons.share_rounded,
+                                          size: 20,
+                                          color: Color(0xFF5B4FCF),
+                                        ),
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
+                              // Content Area with enhanced styling
                               Container(
-                                height: 400,
-                                margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                                constraints: const BoxConstraints(maxHeight: 450),
+                                margin: const EdgeInsets.all(20),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFF5F5F5),
-                                  borderRadius: BorderRadius.circular(16),
+                                  color: const Color(0xFFFAFBFF),
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: const Color(0xFF5B4FCF).withOpacity(0.1),
+                                  ),
                                 ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(16),
-                                  child: Markdown(
-                                    data: _analysisResult!,
-                                    padding: const EdgeInsets.all(16),
-                                    styleSheet: MarkdownStyleSheet(
-                                      h1: GoogleFonts.poppins(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w700,
-                                        color: const Color(0xFF5B4FCF),
+                                child: Column(
+                                  children: [
+                                    // Visual indicator header
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            const Color(0xFFE8F5E9),
+                                            const Color(0xFFE3F2FD),
+                                          ],
+                                        ),
+                                        borderRadius: const BorderRadius.only(
+                                          topLeft: Radius.circular(20),
+                                          topRight: Radius.circular(20),
+                                        ),
                                       ),
-                                      h2: GoogleFonts.poppins(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600,
-                                        color: const Color(0xFF424242),
-                                      ),
-                                      p: GoogleFonts.inter(
-                                        fontSize: 14,
-                                        color: const Color(0xFF616161),
-                                        height: 1.6,
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            width: 8,
+                                            height: 8,
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFF4CAF50),
+                                              shape: BoxShape.circle,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            'Diagnosis Complete',
+                                            style: GoogleFonts.inter(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w600,
+                                              color: const Color(0xFF2E7D32),
+                                            ),
+                                          ),
+                                          const Spacer(),
+                                          const Icon(
+                                            Icons.lightbulb_outline_rounded,
+                                            size: 16,
+                                            color: Color(0xFFFF8F00),
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            'Recommendations included',
+                                            style: GoogleFonts.inter(
+                                              fontSize: 11,
+                                              color: const Color(0xFF795548),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                  ),
+                                    // Markdown content with enhanced styling
+                                    Expanded(
+                                      child: Markdown(
+                                        data: _analysisResult!,
+                                        padding: const EdgeInsets.all(20),
+                                        styleSheet: MarkdownStyleSheet(
+                                          h1: GoogleFonts.poppins(
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.w700,
+                                            color: const Color(0xFF5B4FCF),
+                                            height: 1.4,
+                                          ),
+                                          h2: GoogleFonts.poppins(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w600,
+                                            color: const Color(0xFF2C2C2C),
+                                            height: 1.5,
+                                          ),
+                                          h3: GoogleFonts.poppins(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                            color: const Color(0xFF424242),
+                                            height: 1.5,
+                                          ),
+                                          p: GoogleFonts.inter(
+                                            fontSize: 14,
+                                            color: const Color(0xFF5A5A5A),
+                                            height: 1.7,
+                                            letterSpacing: 0.2,
+                                          ),
+                                          strong: GoogleFonts.inter(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                            color: const Color(0xFF2C2C2C),
+                                          ),
+                                          em: GoogleFonts.inter(
+                                            fontSize: 14,
+                                            fontStyle: FontStyle.italic,
+                                            color: const Color(0xFF5B4FCF),
+                                          ),
+                                          listBullet: GoogleFonts.inter(
+                                            fontSize: 14,
+                                            color: const Color(0xFF5B4FCF),
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          listIndent: 20,
+                                          blockquote: GoogleFonts.inter(
+                                            fontSize: 14,
+                                            color: const Color(0xFF795548),
+                                            fontStyle: FontStyle.italic,
+                                          ),
+                                          blockquotePadding: const EdgeInsets.only(left: 16),
+                                          blockquoteDecoration: BoxDecoration(
+                                            border: Border(
+                                              left: BorderSide(
+                                                color: const Color(0xFF5B4FCF).withOpacity(0.3),
+                                                width: 4,
+                                              ),
+                                            ),
+                                          ),
+                                          code: GoogleFonts.sourceCodePro(
+                                            fontSize: 13,
+                                            backgroundColor: const Color(0xFF5B4FCF).withOpacity(0.08),
+                                            color: const Color(0xFF5B4FCF),
+                                          ),
+                                          codeblockPadding: const EdgeInsets.all(16),
+                                          codeblockDecoration: BoxDecoration(
+                                            color: const Color(0xFF5B4FCF).withOpacity(0.05),
+                                            borderRadius: BorderRadius.circular(12),
+                                            border: Border.all(
+                                              color: const Color(0xFF5B4FCF).withOpacity(0.2),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // Action buttons
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: OutlinedButton.icon(
+                                        onPressed: () {
+                                          setState(() {
+                                            _analysisResult = null;
+                                          });
+                                        },
+                                        icon: const Icon(Icons.refresh_rounded),
+                                        label: Text(
+                                          'New Scan',
+                                          style: GoogleFonts.poppins(
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        style: OutlinedButton.styleFrom(
+                                          foregroundColor: const Color(0xFF5B4FCF),
+                                          side: BorderSide(
+                                            color: const Color(0xFF5B4FCF).withOpacity(0.3),
+                                          ),
+                                          padding: const EdgeInsets.symmetric(vertical: 12),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      flex: 2,
+                                      child: ElevatedButton.icon(
+                                        onPressed: _openGeneralChatbot,
+                                        icon: const Icon(Icons.chat_bubble_outline_rounded),
+                                        label: Text(
+                                          'Ask Follow-up Questions',
+                                          style: GoogleFonts.poppins(
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(0xFF5B4FCF),
+                                          foregroundColor: Colors.white,
+                                          elevation: 0,
+                                          padding: const EdgeInsets.symmetric(vertical: 12),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],

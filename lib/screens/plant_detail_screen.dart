@@ -541,14 +541,30 @@ class _PlantDetailScreenState extends State<PlantDetailScreen>
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: "plant_chat_fab",
-        onPressed: () {
-          NavigationUtils.openPlantChat(context, _currentPlant);
-        },
-        backgroundColor: const Color(0xFF2E7D32),
-        foregroundColor: Colors.white,
-        child: const Icon(Icons.chat_rounded),
+      floatingActionButton: Container(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF5B4FCF), Color(0xFF7C6FE8)],
+          ),
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF5B4FCF).withOpacity(0.3),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: FloatingActionButton(
+          heroTag: "plant_chat_fab",
+          onPressed: () {
+            NavigationUtils.openPlantChat(context, _currentPlant);
+          },
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          foregroundColor: Colors.white,
+          child: const Icon(Icons.chat_bubble_rounded),
+        ),
       ),
     );
   }
