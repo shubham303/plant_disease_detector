@@ -6,6 +6,7 @@ import 'package:velocity_x/velocity_x.dart';
 import '../widgets/plant_scan_widget.dart';
 import '../utils/navigation_utils.dart';
 import 'profile_screen.dart';
+import 'scan_history_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -52,18 +53,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final appBarHeight = screenHeight * 0.30; // 20% of screen height
     
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/plant_background.jpg'),
-            fit: BoxFit.cover,
-            colorFilter: ColorFilter.mode(
-              Colors.white.withOpacity(0.95),
-              BlendMode.overlay,
-            ),
-          ),
-        ),
-        child: CustomScrollView(
+      backgroundColor: const Color(0xFFFFFBF0), // Yellowish white background
+      body: CustomScrollView(
         slivers: [
           // Custom App Bar
           SliverAppBar(
@@ -180,21 +171,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   maxHeight: 90,
                                   minHeight: 70,
                                 ),
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image: AssetImage('assets/images/plant_hero.jpg'),
-                                    fit: BoxFit.cover,
-                                  ),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
                                 child: Container(
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
                                       begin: Alignment.centerLeft,
                                       end: Alignment.centerRight,
                                       colors: [
-                                        Colors.black.withOpacity(0.7),
-                                        Colors.black.withOpacity(0.3),
+                                        const Color(0xFF5B4FCF).withOpacity(0.9),
+                                        const Color(0xFF7C6FE8).withOpacity(0.7),
                                       ],
                                     ),
                                     borderRadius: BorderRadius.circular(20),
@@ -328,7 +312,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                       subtitle: 'Past scans',
                                       color: const Color(0xFF5B4FCF),
                                       onTap: () {
-                                        // Navigate to history
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => const ScanHistoryScreen(),
+                                          ),
+                                        );
                                       },
                                     ),
                                   ),
@@ -786,7 +775,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
           ),
         ],
-      ),
       ),
     );
   }

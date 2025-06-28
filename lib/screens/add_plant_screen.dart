@@ -501,18 +501,8 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
     final screenHeight = MediaQuery.of(context).size.height;
     
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/carlita-benazito-vnd50_tpkqg-unsplash.jpg'),
-            fit: BoxFit.cover,
-            colorFilter: ColorFilter.mode(
-              Colors.white.withOpacity(0.95),
-              BlendMode.overlay,
-            ),
-          ),
-        ),
-        child: SafeArea(
+      backgroundColor: const Color(0xFFFFFBF0), // Yellowish white background
+      body: SafeArea(
           child: Column(
             children: [
               // Custom App Bar
@@ -573,20 +563,7 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               // Image Selection Section
-                              Container(
-                                padding: const EdgeInsets.all(20),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.95),
-                                  borderRadius: BorderRadius.circular(24),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color(0xFF5B4FCF).withOpacity(0.1),
-                                      blurRadius: 30,
-                                      offset: const Offset(0, 10),
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
+                              Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
@@ -620,7 +597,7 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
                                       child: Container(
                                         height: 180,
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFFF5F7FA),
+                                          color: Colors.white,
                                           borderRadius: BorderRadius.circular(16),
                                           border: Border.all(
                                             color: const Color(0xFF5B4FCF).withOpacity(0.2),
@@ -633,26 +610,12 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
                                       ),
                                     ),
                                   ],
-                                ),
                               ),
 
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 24),
 
                               // Plant Type Selection
-                              Container(
-                                padding: const EdgeInsets.all(20),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.95),
-                                  borderRadius: BorderRadius.circular(24),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color(0xFF5B4FCF).withOpacity(0.1),
-                                      blurRadius: 30,
-                                      offset: const Offset(0, 10),
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
+                              Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
@@ -698,7 +661,7 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
                                           fontSize: 14,
                                         ),
                                         filled: true,
-                                        fillColor: const Color(0xFFF5F7FA),
+                                        fillColor: Colors.white,
                                         border: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(12),
                                           borderSide: BorderSide.none,
@@ -752,27 +715,12 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
                                       },
                                     ),
                                   ],
-                                ),
                               ),
 
-
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 24),
 
                               // Plantation Date and Age
-                              Container(
-                                padding: const EdgeInsets.all(20),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.95),
-                                  borderRadius: BorderRadius.circular(24),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color(0xFF5B4FCF).withOpacity(0.1),
-                                      blurRadius: 30,
-                                      offset: const Offset(0, 10),
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
+                              Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
@@ -834,7 +782,7 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
                                           vertical: 14,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFFF5F7FA),
+                                          color: Colors.white,
                                           border: Border.all(
                                             color: const Color(0xFF5B4FCF).withOpacity(0.1),
                                           ),
@@ -902,26 +850,12 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
                             ),
                                     ],
                                   ],
-                                ),
                               ),
 
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 24),
 
                               // Growing Conditions
-                              Container(
-                                padding: const EdgeInsets.all(20),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.95),
-                                  borderRadius: BorderRadius.circular(24),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color(0xFF5B4FCF).withOpacity(0.1),
-                                      blurRadius: 30,
-                                      offset: const Offset(0, 10),
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
+                              Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
@@ -1008,7 +942,7 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
                                       width: double.infinity,
                                       padding: const EdgeInsets.symmetric(horizontal: 16),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFF5F7FA),
+                                        color: Colors.white,
                                         border: Border.all(
                                           color: const Color(0xFF5B4FCF).withOpacity(0.1),
                                         ),
@@ -1049,26 +983,12 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
                             ),
                           ),
                                   ],
-                                ),
                               ),
 
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 24),
 
                               // Notes Section
-                              Container(
-                                padding: const EdgeInsets.all(20),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.95),
-                                  borderRadius: BorderRadius.circular(24),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color(0xFF5B4FCF).withOpacity(0.1),
-                                      blurRadius: 30,
-                                      offset: const Offset(0, 10),
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
+                              Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
@@ -1141,7 +1061,7 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
                                           fontSize: 14,
                                         ),
                                         filled: true,
-                                        fillColor: const Color(0xFFF5F7FA),
+                                        fillColor: Colors.white,
                                         border: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(12),
                                           borderSide: BorderSide.none,
@@ -1164,10 +1084,9 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
                                       style: GoogleFonts.inter(fontSize: 14),
                                     ),
                                   ],
-                                ),
                               ),
 
-                              const SizedBox(height: 24),
+                              const SizedBox(height: 32),
 
                               // Save Button
                               AnimatedContainer(
@@ -1238,7 +1157,6 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
               ],
             ),
           ),
-        ),
       );
   }
 
@@ -1300,7 +1218,7 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
               onTap: _showImageSourceDialog,
               child: Container(
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF5F7FA),
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: const Color(0xFF5B4FCF).withOpacity(0.2),

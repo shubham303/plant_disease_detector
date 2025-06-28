@@ -52,18 +52,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     final user = FirebaseAuth.instance.currentUser;
     
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/erda-estremera-0ZxdAGG4aWU-unsplash.jpg'),
-            fit: BoxFit.cover,
-            colorFilter: ColorFilter.mode(
-              Colors.white.withOpacity(0.95),
-              BlendMode.overlay,
-            ),
-          ),
-        ),
-        child: SafeArea(
+      backgroundColor: const Color(0xFFFFFBF0), // Yellowish white background
+      body: SafeArea(
           child: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(24.0),
@@ -293,7 +283,6 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
               ),
             ),
           ),
-        ),
       ),
     );
   }

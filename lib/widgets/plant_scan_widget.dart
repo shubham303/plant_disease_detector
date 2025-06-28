@@ -53,7 +53,7 @@ class _PlantScanWidgetState extends State<PlantScanWidget> with SingleTickerProv
     ImagePickerWidget.show(
       context,
       onImagesSelected: _onImagesSelected,
-      title: 'Add Plant Images',
+      title: 'Select Plant Images',
       allowMultiple: true,
       primaryColor: const Color(0xFF5B4FCF),
     );

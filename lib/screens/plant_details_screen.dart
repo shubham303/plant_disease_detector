@@ -159,18 +159,8 @@ class _PlantDetailsScreenState extends State<PlantDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/plant_header.jpg'),
-            fit: BoxFit.cover,
-            colorFilter: ColorFilter.mode(
-              Colors.white.withOpacity(0.95),
-              BlendMode.overlay,
-            ),
-          ),
-        ),
-        child: SafeArea(
+      backgroundColor: const Color(0xFFFFFBF0), // Yellowish white background
+      body: SafeArea(
           child: Column(
             children: [
               // Custom App Bar
@@ -779,7 +769,6 @@ class _PlantDetailsScreenState extends State<PlantDetailsScreen> {
               ),
             ],
           ),
-        ),
       ),
     );
   }

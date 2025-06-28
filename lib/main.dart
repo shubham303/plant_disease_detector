@@ -217,8 +217,11 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateMixin {
   int _currentIndex = 0;
+  bool _isNavBarVisible = true;
+  late AnimationController _navBarAnimationController;
+  late Animation<Offset> _navBarAnimation;
   
   final List<Widget> _screens = [
     const HomeScreen(),
@@ -227,18 +230,67 @@ class _MainScreenState extends State<MainScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _navBarAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _navBarAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(0, 1),
+    ).animate(CurvedAnimation(
+      parent: _navBarAnimationController,
+      curve: Curves.easeInOut,
+    ));
+  }
+
+  @override
+  void dispose() {
+    _navBarAnimationController.dispose();
+    super.dispose();
+  }
+
+  void _handleScroll(bool isScrollingDown) {
+    if (isScrollingDown && _isNavBarVisible) {
+      setState(() => _isNavBarVisible = false);
+      _navBarAnimationController.forward();
+    } else if (!isScrollingDown && !_isNavBarVisible) {
+      setState(() => _isNavBarVisible = true);
+      _navBarAnimationController.reverse();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
+      body: NotificationListener<ScrollNotification>(
+        onNotification: (scrollNotification) {
+          if (scrollNotification is ScrollUpdateNotification) {
+            final delta = scrollNotification.scrollDelta;
+            if (delta != null) {
+              _handleScroll(delta > 0);
+            }
+          }
+          return false;
+        },
+        child: IndexedStack(
+          index: _currentIndex,
+          children: _screens,
+        ),
       ),
-      bottomNavigationBar: Container(
+      bottomNavigationBar: SlideTransition(
+        position: _navBarAnimation,
+        child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(25),
+            topRight: Radius.circular(25),
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withOpacity(0.08),
               blurRadius: 20,
               offset: const Offset(0, -5),
             ),
@@ -273,6 +325,7 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ),
       ),
+      ),
     );
   }
 
@@ -288,32 +341,76 @@ class _MainScreenState extends State<MainScreen> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         padding: EdgeInsets.symmetric(
-          horizontal: isSelected ? 20 : 16,
-          vertical: 10,
+          horizontal: isSelected ? 24 : 16,
+          vertical: 12,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF5B4FCF).withOpacity(0.1) : Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
+          gradient: isSelected 
+              ? LinearGradient(
+                  colors: [
+                    const Color(0xFF5B4FCF).withOpacity(0.1),
+                    const Color(0xFF7C6FE8).withOpacity(0.05),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
+              : null,
+          color: !isSelected ? Colors.transparent : null,
+          borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              child: Icon(
-                isSelected ? selectedIcon : icon,
-                color: isSelected ? const Color(0xFF5B4FCF) : const Color(0xFF9E9E9E),
-                size: isSelected ? 28 : 24,
-              ),
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                if (isSelected)
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF5B4FCF), Color(0xFF7C6FE8)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF5B4FCF).withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                  ),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  width: isSelected ? 40 : 32,
+                  height: isSelected ? 40 : 32,
+                  alignment: Alignment.center,
+                  decoration: isSelected
+                      ? null
+                      : BoxDecoration(
+                          color: const Color(0xFFF5F5F5),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                  child: Icon(
+                    isSelected ? selectedIcon : icon,
+                    color: isSelected ? Colors.white : const Color(0xFF9E9E9E),
+                    size: isSelected ? 24 : 22,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
             AnimatedDefaultTextStyle(
               duration: const Duration(milliseconds: 300),
               style: GoogleFonts.poppins(
                 color: isSelected ? const Color(0xFF5B4FCF) : const Color(0xFF757575),
                 fontSize: isSelected ? 12 : 11,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                letterSpacing: isSelected ? 0.5 : 0,
+                letterSpacing: isSelected ? 0.3 : 0,
               ),
               child: Text(label),
             ),

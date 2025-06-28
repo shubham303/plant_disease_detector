@@ -71,7 +71,7 @@ class _PlantChatScreenState extends State<PlantChatScreen>
       onImagesSelected: _onImagesSelected,
       title: 'Add Images to Chat',
       allowMultiple: true,
-      primaryColor: const Color(0xFF4CAF50),
+      primaryColor: const Color(0xFF5B4FCF),
     );
   }
 
@@ -269,9 +269,9 @@ class _PlantChatScreenState extends State<PlantChatScreen>
                           ),
                         ),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF4CAF50),
+                          foregroundColor: const Color(0xFF5B4FCF),
                           side: BorderSide(
-                            color: const Color(0xFF4CAF50).withOpacity(0.3),
+                            color: const Color(0xFF5B4FCF).withOpacity(0.3),
                           ),
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           shape: RoundedRectangleBorder(
@@ -295,7 +295,7 @@ class _PlantChatScreenState extends State<PlantChatScreen>
                           ),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF4CAF50),
+                          backgroundColor: const Color(0xFF5B4FCF),
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           shape: RoundedRectangleBorder(
@@ -561,18 +561,8 @@ class _PlantChatScreenState extends State<PlantChatScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/kevin-mueller-QGSrJHopKwY-unsplash.jpg'),
-            fit: BoxFit.cover,
-            colorFilter: ColorFilter.mode(
-              Colors.white.withOpacity(0.95),
-              BlendMode.overlay,
-            ),
-          ),
-        ),
-        child: SafeArea(
+      backgroundColor: const Color(0xFFFFFBF0), // Yellowish white background
+      body: SafeArea(
           child: Column(
             children: [
               // Custom App Bar
@@ -629,15 +619,15 @@ class _PlantChatScreenState extends State<PlantChatScreen>
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF4CAF50).withOpacity(0.1),
+                        color: const Color(0xFF5B4FCF).withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: const Color(0xFF4CAF50).withOpacity(0.3),
+                          color: const Color(0xFF5B4FCF).withOpacity(0.3),
                         ),
                       ),
                       child: const Icon(
                         Icons.eco_rounded,
-                        color: Color(0xFF4CAF50),
+                        color: Color(0xFF5B4FCF),
                         size: 24,
                       ),
                     ),
@@ -660,7 +650,6 @@ class _PlantChatScreenState extends State<PlantChatScreen>
               _buildMessageInput(),
             ],
           ),
-        ),
       ),
     );
   }
@@ -679,12 +668,12 @@ class _PlantChatScreenState extends State<PlantChatScreen>
               height: 36,
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [Color(0xFF4CAF50), Color(0xFF66BB6A)],
+                  colors: [Color(0xFF5B4FCF), Color(0xFF7C6FE8)],
                 ),
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF4CAF50).withOpacity(0.3),
+                    color: const Color(0xFF5B4FCF).withOpacity(0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -826,12 +815,12 @@ class _PlantChatScreenState extends State<PlantChatScreen>
             height: 36,
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [Color(0xFF4CAF50), Color(0xFF66BB6A)],
+                colors: [Color(0xFF5B4FCF), Color(0xFF7C6FE8)],
               ),
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF4CAF50).withOpacity(0.3),
+                  color: const Color(0xFF5B4FCF).withOpacity(0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -993,12 +982,12 @@ class _PlantChatScreenState extends State<PlantChatScreen>
                 Container(
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [Color(0xFF4CAF50), Color(0xFF66BB6A)],
+                      colors: [Color(0xFF5B4FCF), Color(0xFF7C6FE8)],
                     ),
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF4CAF50).withOpacity(0.3),
+                        color: const Color(0xFF5B4FCF).withOpacity(0.3),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),

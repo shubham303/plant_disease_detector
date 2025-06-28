@@ -199,18 +199,8 @@ class _MyPlantsScreenState extends State<MyPlantsScreen> with TickerProviderStat
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/markus-spiske-sFydXGrt5OA-unsplash.jpg'),
-            fit: BoxFit.cover,
-            colorFilter: ColorFilter.mode(
-              Colors.white.withOpacity(0.95),
-              BlendMode.overlay,
-            ),
-          ),
-        ),
-        child: SafeArea(
+      backgroundColor: const Color(0xFFFFFBF0), // Yellowish white background
+      body: SafeArea(
           child: Column(
             children: [
               // Custom App Bar
@@ -252,32 +242,11 @@ class _MyPlantsScreenState extends State<MyPlantsScreen> with TickerProviderStat
                         textAlign: TextAlign.center,
                       ),
                     ),
-                    IconButton(
-                      icon: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.95),
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 15,
-                              offset: const Offset(0, 5),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.add_rounded,
-                          color: Color(0xFF5B4FCF),
-                          size: 20,
-                        ),
-                      ),
-                      onPressed: _addPlant,
-                      tooltip: 'Add Plant',
-                    ),
+                    const SizedBox(width: 48), // Spacer to center the title
                   ],
                 ),
               ),
+              const SizedBox(height: 16),
               Expanded(
                 child: _isLoading
                     ? const Center(
@@ -293,7 +262,7 @@ class _MyPlantsScreenState extends State<MyPlantsScreen> with TickerProviderStat
                               onRefresh: _loadPlants,
                               color: const Color(0xFF5B4FCF),
                               child: ListView.builder(
-                                padding: const EdgeInsets.all(16),
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
                                 itemCount: _plants.length,
                                 itemBuilder: (context, index) {
                                   final plant = _plants[index];
@@ -305,7 +274,6 @@ class _MyPlantsScreenState extends State<MyPlantsScreen> with TickerProviderStat
               ),
             ],
           ),
-        ),
       ),
       floatingActionButton: Container(
         decoration: BoxDecoration(
@@ -345,19 +313,14 @@ class _MyPlantsScreenState extends State<MyPlantsScreen> with TickerProviderStat
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(40),
+              padding: const EdgeInsets.all(32),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    const Color(0xFF5B4FCF).withOpacity(0.1),
-                    const Color(0xFF7C6FE8).withOpacity(0.05),
-                  ],
-                ),
+                color: const Color(0xFF5B4FCF).withOpacity(0.08),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
                 Icons.local_florist_rounded,
-                size: 80,
+                size: 64,
                 color: Color(0xFF5B4FCF),
               ),
             ),
@@ -365,17 +328,17 @@ class _MyPlantsScreenState extends State<MyPlantsScreen> with TickerProviderStat
             Text(
               'No Plants Yet',
               style: GoogleFonts.poppins(
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
                 color: const Color(0xFF1A1A1A),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             Text(
-              'Start building your plant collection by adding your first plant!',
+              'Start your plant collection by\nadding your first plant!',
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
-                fontSize: 15,
+                fontSize: 14,
                 color: const Color(0xFF757575),
                 height: 1.5,
               ),
@@ -434,153 +397,127 @@ class _MyPlantsScreenState extends State<MyPlantsScreen> with TickerProviderStat
   Widget _buildPlantCard(Plant plant, int index) {
     return AnimatedContainer(
       duration: Duration(milliseconds: 200 + (index * 100)),
-      margin: const EdgeInsets.only(bottom: 16),
-      child: InkWell(
-        onTap: () async {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => PlantDetailScreen(plant: plant),
+      margin: const EdgeInsets.only(bottom: 12),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () async {
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PlantDetailScreen(plant: plant),
+              ),
+            );
+            if (result == true) {
+              _loadPlants();
+            }
+          },
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: const Color(0xFFE0E0E0),
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
-          );
-          if (result == true) {
-            _loadPlants();
-          }
-        },
-        borderRadius: BorderRadius.circular(24),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.95),
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF5B4FCF).withOpacity(0.1),
-                blurRadius: 30,
-                offset: const Offset(0, 10),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Hero(
-                tag: 'plant-${plant.id}',
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    color: Colors.grey[200],
-                  ),
-                  child: plant.imagePath.isNotEmpty
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: kIsWeb
-                              ? Image.network(
-                                  plant.imagePath,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      _buildPlantIcon(),
-                                )
-                              : (File(plant.imagePath).existsSync()
-                                  ? Image.file(
-                                      File(plant.imagePath),
-                                      fit: BoxFit.cover,
-                                    )
-                                  : _buildPlantIcon()),
-                        )
-                      : _buildPlantIcon(),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      plant.name,
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xFF1A1A1A),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Added ${_formatDate(plant.dateAdded)}',
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        color: const Color(0xFF757575),
-                      ),
-                    ),
-                    if (plant.notes != null && plant.notes!.isNotEmpty) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        plant.notes!,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          color: const Color(0xFF9E9E9E),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
+            child: Row(
+              children: [
+                Hero(
+                  tag: 'plant-${plant.id}',
+                  child: Container(
+                    width: 64,
+                    height: 64,
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF5B4FCF), Color(0xFF7C6FE8)],
-                      ),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(
-                      Icons.chevron_right_rounded,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  PopupMenuButton<String>(
-                    icon: Icon(
-                      Icons.more_vert_rounded,
-                      color: const Color(0xFF9E9E9E),
-                      size: 20,
-                    ),
-                    shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
+                      color: const Color(0xFFF5F5F5),
                     ),
-                    elevation: 8,
-                    itemBuilder: (context) => [
-                      PopupMenuItem(
-                        value: 'delete',
-                        child: Row(
-                          children: [
-                            Icon(Icons.delete_outline_rounded, color: const Color(0xFFE57373)),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Delete',
-                              style: GoogleFonts.inter(
-                                color: const Color(0xFF424242),
-                              ),
-                            ),
-                          ],
+                    child: plant.imagePath.isNotEmpty
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: kIsWeb
+                                ? Image.network(
+                                    plant.imagePath,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) =>
+                                        _buildPlantIcon(),
+                                  )
+                                : (File(plant.imagePath).existsSync()
+                                    ? Image.file(
+                                        File(plant.imagePath),
+                                        fit: BoxFit.cover,
+                                      )
+                                    : _buildPlantIcon()),
+                          )
+                        : _buildPlantIcon(),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        plant.name,
+                        style: GoogleFonts.poppins(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF1A1A1A),
                         ),
                       ),
+                      const SizedBox(height: 2),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.schedule_rounded,
+                            size: 12,
+                            color: const Color(0xFF9E9E9E),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            _formatDate(plant.dateAdded),
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              color: const Color(0xFF757575),
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (plant.notes != null && plant.notes!.isNotEmpty) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          plant.notes!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            color: const Color(0xFF9E9E9E),
+                          ),
+                        ),
+                      ],
                     ],
-                    onSelected: (value) {
-                      if (value == 'delete') {
-                        _deletePlant(plant);
-                      }
-                    },
                   ),
-                ],
-              ),
-            ],
+                ),
+                IconButton(
+                  onPressed: () => _deletePlant(plant),
+                  icon: Icon(
+                    Icons.delete_outline_rounded,
+                    color: const Color(0xFFE57373),
+                    size: 20,
+                  ),
+                  tooltip: 'Delete plant',
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -590,13 +527,13 @@ class _MyPlantsScreenState extends State<MyPlantsScreen> with TickerProviderStat
   Widget _buildPlantIcon() {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF4CAF50).withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
+        color: const Color(0xFF5B4FCF).withOpacity(0.08),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: const Icon(
         Icons.local_florist_rounded,
-        color: Color(0xFF2E7D32),
-        size: 40,
+        color: Color(0xFF5B4FCF),
+        size: 32,
       ),
     );
   }

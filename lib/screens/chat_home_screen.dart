@@ -55,7 +55,7 @@ class _ChatHomeScreenState extends State<ChatHomeScreen> with TickerProviderStat
   void _addWelcomeMessage() {
     final welcomeMessage = ChatMessage(
       id: const Uuid().v4(),
-      content: 'Hello! I\'m your plant care assistant. How can I help you today?\n\nI can help you with:\n• Plant identification and care tips\n• Disease diagnosis from photos\n• Watering and fertilizing schedules\n• General gardening advice',
+      content: '🌿 Hello! I\'m your AI-powered plant care assistant.\n\nHow can I help you today?\n\n**I can assist with:**\n• 🌱 Plant identification and care tips\n• 🔍 Disease diagnosis from photos\n• 💧 Watering and fertilizing schedules\n• 🌻 General gardening advice\n\nFeel free to ask questions or share photos of your plants!',
       isUser: false,
       timestamp: DateTime.now(),
     );
@@ -289,10 +289,17 @@ class _ChatHomeScreenState extends State<ChatHomeScreen> with TickerProviderStat
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
+        content: Row(
+          children: [
+            const Icon(Icons.error_outline, color: Colors.white),
+            const SizedBox(width: 8),
+            Expanded(child: Text(message)),
+          ],
+        ),
         backgroundColor: const Color(0xFFE57373),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.all(16),
       ),
     );
   }
@@ -300,18 +307,8 @@ class _ChatHomeScreenState extends State<ChatHomeScreen> with TickerProviderStat
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/kevin-mueller-QGSrJHopKwY-unsplash.jpg'),
-            fit: BoxFit.cover,
-            colorFilter: ColorFilter.mode(
-              Colors.white.withOpacity(0.95),
-              BlendMode.overlay,
-            ),
-          ),
-        ),
-        child: SafeArea(
+      backgroundColor: const Color(0xFFFFFBF0), // Yellowish white background
+      body: SafeArea(
           child: Column(
             children: [
               // Custom App Bar
@@ -364,14 +361,22 @@ class _ChatHomeScreenState extends State<ChatHomeScreen> with TickerProviderStat
                                 decoration: BoxDecoration(
                                   color: const Color(0xFF4CAF50),
                                   shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(0xFF4CAF50).withOpacity(0.5),
+                                      blurRadius: 4,
+                                      spreadRadius: 1,
+                                    ),
+                                  ],
                                 ),
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                'Online',
+                                'AI Active',
                                 style: GoogleFonts.inter(
                                   fontSize: 12,
                                   color: const Color(0xFF4CAF50),
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ],
@@ -537,25 +542,21 @@ class _ChatHomeScreenState extends State<ChatHomeScreen> with TickerProviderStat
                         // Image picker button
                         Container(
                           decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF5B4FCF), Color(0xFF7C6FE8)],
-                            ),
+                            color: const Color(0xFF5B4FCF).withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFF5B4FCF).withOpacity(0.3),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
+                            border: Border.all(
+                              color: const Color(0xFF5B4FCF).withOpacity(0.3),
+                              width: 1,
+                            ),
                           ),
                           child: IconButton(
                             onPressed: _showImageSourceDialog,
                             icon: const Icon(
                               Icons.add_a_photo_rounded,
-                              color: Colors.white,
+                              color: Color(0xFF5B4FCF),
                               size: 20,
                             ),
+                            tooltip: 'Add photo',
                           ),
                         ),
                       const SizedBox(width: 12),
@@ -564,9 +565,12 @@ class _ChatHomeScreenState extends State<ChatHomeScreen> with TickerProviderStat
                         Expanded(
                           child: Container(
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF5F7FA),
+                              color: Colors.grey[100],
                               borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: const Color(0xFF5B4FCF).withOpacity(0.2)),
+                              border: Border.all(
+                                color: Colors.grey[300]!,
+                                width: 1,
+                              ),
                             ),
                             child: TextField(
                               controller: _textController,
@@ -574,7 +578,7 @@ class _ChatHomeScreenState extends State<ChatHomeScreen> with TickerProviderStat
                               decoration: InputDecoration(
                                 hintText: 'Ask about your plants...',
                                 hintStyle: GoogleFonts.inter(
-                                  color: const Color(0xFF9E9E9E),
+                                  color: Colors.grey[600]!,
                                   fontSize: 14,
                                 ),
                                 border: InputBorder.none,
@@ -584,7 +588,7 @@ class _ChatHomeScreenState extends State<ChatHomeScreen> with TickerProviderStat
                                 ),
                               ),
                               style: GoogleFonts.inter(
-                                color: const Color(0xFF424242),
+                                color: Colors.grey[800]!,
                                 fontSize: 14,
                               ),
                               maxLines: null,
@@ -617,6 +621,7 @@ class _ChatHomeScreenState extends State<ChatHomeScreen> with TickerProviderStat
                               color: Colors.white,
                               size: 20,
                             ),
+                            tooltip: 'Send message',
                           ),
                         ),
                       ],
@@ -627,7 +632,6 @@ class _ChatHomeScreenState extends State<ChatHomeScreen> with TickerProviderStat
             ),
             ],
           ),
-        ),
       ),
     );
   }
@@ -746,9 +750,15 @@ class _ChatHomeScreenState extends State<ChatHomeScreen> with TickerProviderStat
                   ),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: message.isUser 
-                        ? const Color(0xFF5B4FCF).withOpacity(0.1)
-                        : Colors.white.withOpacity(0.95),
+                    gradient: message.isUser 
+                        ? LinearGradient(
+                            colors: [
+                              const Color(0xFF5B4FCF).withOpacity(0.1),
+                              const Color(0xFF7C6FE8).withOpacity(0.08),
+                            ],
+                          )
+                        : null,
+                    color: message.isUser ? null : Colors.white.withOpacity(0.95),
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
@@ -811,24 +821,27 @@ class _ChatHomeScreenState extends State<ChatHomeScreen> with TickerProviderStat
                                 data: message.content,
                                 styleSheet: MarkdownStyleSheet(
                                   p: GoogleFonts.inter(
-                                    color: const Color(0xFF5A5A5A),
+                                    color: Colors.grey[700]!,
                                     fontSize: 14,
                                     height: 1.6,
                                   ),
                                   h1: GoogleFonts.poppins(
-                                    color: const Color(0xFF1A1A1A),
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xFF5B4FCF),
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w700,
+                                    height: 1.4,
                                   ),
                                   h2: GoogleFonts.poppins(
                                     color: const Color(0xFF2C2C2C),
-                                    fontSize: 16,
+                                    fontSize: 18,
                                     fontWeight: FontWeight.w600,
+                                    height: 1.5,
                                   ),
                                   h3: GoogleFonts.poppins(
                                     color: const Color(0xFF424242),
-                                    fontSize: 14,
+                                    fontSize: 16,
                                     fontWeight: FontWeight.w600,
+                                    height: 1.5,
                                   ),
                                   listBullet: GoogleFonts.inter(
                                     color: const Color(0xFF5B4FCF),
@@ -842,8 +855,22 @@ class _ChatHomeScreenState extends State<ChatHomeScreen> with TickerProviderStat
                                   ),
                                   code: GoogleFonts.sourceCodePro(
                                     fontSize: 13,
-                                    backgroundColor: const Color(0xFF5B4FCF).withOpacity(0.08),
+                                    backgroundColor: const Color(0xFF5B4FCF).withOpacity(0.1),
                                     color: const Color(0xFF5B4FCF),
+                                  ),
+                                  blockquote: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    color: Colors.grey[600]!,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                  blockquotePadding: const EdgeInsets.only(left: 16),
+                                  blockquoteDecoration: BoxDecoration(
+                                    border: Border(
+                                      left: BorderSide(
+                                        color: const Color(0xFF5B4FCF).withOpacity(0.3),
+                                        width: 4,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -854,7 +881,7 @@ class _ChatHomeScreenState extends State<ChatHomeScreen> with TickerProviderStat
                 Text(
                   _formatTime(message.timestamp),
                   style: GoogleFonts.inter(
-                    color: const Color(0xFF8E8E8E),
+                    color: Colors.grey[500]!,
                     fontSize: 12,
                   ),
                 ),
@@ -868,16 +895,24 @@ class _ChatHomeScreenState extends State<ChatHomeScreen> with TickerProviderStat
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: const Color(0xFF4CAF50).withOpacity(0.1),
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: const Color(0xFF4CAF50).withOpacity(0.3),
-                  width: 1.5,
+                gradient: LinearGradient(
+                  colors: [
+                    const Color(0xFF4CAF50).withOpacity(0.8),
+                    const Color(0xFF66BB6A).withOpacity(0.8),
+                  ],
                 ),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF4CAF50).withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: const Icon(
                 Icons.person_rounded,
-                color: Color(0xFF4CAF50),
+                color: Colors.white,
                 size: 18,
               ),
             ),

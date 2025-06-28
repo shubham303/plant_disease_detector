@@ -40,13 +40,63 @@ class _NotificationsScreenState extends State<NotificationsScreen>
     setState(() => _isLoading = true);
     try {
       final notifications = await NotificationService.getNotifications();
-      setState(() {
-        _notifications = notifications;
-        _isLoading = false;
-      });
+      
+      // Add dummy notifications if empty (for demo purposes)
+      if (notifications.isEmpty) {
+        await _addInitialDummyNotifications();
+        final updatedNotifications = await NotificationService.getNotifications();
+        setState(() {
+          _notifications = updatedNotifications;
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _notifications = notifications;
+          _isLoading = false;
+        });
+      }
       _animationController.forward();
     } catch (e) {
       setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _addInitialDummyNotifications() async {
+    final dummyNotifications = [
+      NotificationItem(
+        id: '1',
+        title: 'Welcome to PlantCare Pro!',
+        message: 'Start your plant care journey by scanning your first plant. Our AI will help identify diseases and provide care tips.',
+        timestamp: DateTime.now().subtract(const Duration(minutes: 5)),
+        type: 'general',
+      ),
+      NotificationItem(
+        id: '2',
+        title: 'Perfect Weather for Plants',
+        message: 'Sunny with moderate humidity today. Great time to check your outdoor plants and ensure they have enough water.',
+        timestamp: DateTime.now().subtract(const Duration(hours: 2)),
+        type: 'weather',
+        isRead: true,
+      ),
+      NotificationItem(
+        id: '3',
+        title: 'Weekly Plant Check Reminder',
+        message: 'Time for your weekly plant inspection. Look for yellowing leaves, pests, or signs of disease.',
+        timestamp: DateTime.now().subtract(const Duration(days: 1)),
+        type: 'care',
+      ),
+      NotificationItem(
+        id: '4',
+        title: 'Plant Care Tip',
+        message: 'Did you know? Most indoor plants prefer indirect sunlight. Direct sun can burn their leaves.',
+        timestamp: DateTime.now().subtract(const Duration(days: 2)),
+        type: 'general',
+        isRead: true,
+      ),
+    ];
+
+    for (final notification in dummyNotifications) {
+      await NotificationService.addNotification(notification);
     }
   }
 
@@ -64,7 +114,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Notification deleted'),
-          backgroundColor: Colors.green,
+          backgroundColor: const Color(0xFF4CAF50),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
@@ -72,116 +122,83 @@ class _NotificationsScreenState extends State<NotificationsScreen>
     }
   }
 
-  Future<void> _addSampleNotification() async {
-    final sampleNotifications = [
-      NotificationItem(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        title: 'Weather Update',
-        message: 'Sunny weather expected for the next 3 days. Perfect time for outdoor plant care!',
-        timestamp: DateTime.now(),
-        type: 'weather',
-      ),
-      NotificationItem(
-        id: (DateTime.now().millisecondsSinceEpoch + 1).toString(),
-        title: 'Watering Reminder',
-        message: 'It\'s time to check if your plants need watering. Check soil moisture levels.',
-        timestamp: DateTime.now(),
-        type: 'care',
-      ),
-      NotificationItem(
-        id: (DateTime.now().millisecondsSinceEpoch + 2).toString(),
-        title: 'Plant Care Tip',
-        message: 'Did you know? Yellow leaves often indicate overwatering or nutrient deficiency.',
-        timestamp: DateTime.now(),
-        type: 'general',
-      ),
-    ];
-
-    final randomNotification = sampleNotifications[
-        DateTime.now().millisecond % sampleNotifications.length
-    ];
-    
-    await NotificationService.addNotification(randomNotification);
-    _loadNotifications();
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      backgroundColor: const Color(0xFFFFFBF0), // Yellowish white background
+      body: SafeArea(
+        child: Column(
           children: [
-            Text(
-              'Notifications',
-              style: GoogleFonts.inter(
-                fontWeight: FontWeight.w700,
-                fontSize: 24,
-              ),
-            ),
-            if (_notifications.isNotEmpty)
-              FutureBuilder<int>(
-                future: NotificationService.getUnreadCount(),
-                builder: (context, snapshot) {
-                  final unreadCount = snapshot.data ?? 0;
-                  return Text(
-                    unreadCount > 0 
-                        ? '$unreadCount unread'
-                        : 'All caught up!',
-                    style: GoogleFonts.inter(
-                      fontWeight: FontWeight.w400,
-                      fontSize: 14,
-                      color: Colors.white.withOpacity(0.9),
-                    ),
-                  );
-                },
-              ),
-          ],
-        ),
-        backgroundColor: const Color(0xFF2E7D32),
-        foregroundColor: Colors.white,
-        elevation: 0,
-        actions: [
-          IconButton(
-            onPressed: _addSampleNotification,
-            icon: const Icon(Icons.add_rounded),
-            tooltip: 'Add Sample Notification',
-          ),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(
-                color: Color(0xFF2E7D32),
-              ),
-            )
-          : _notifications.isEmpty
-              ? _buildEmptyState()
-              : FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: RefreshIndicator(
-                    onRefresh: _loadNotifications,
-                    color: const Color(0xFF2E7D32),
-                    child: ListView.builder(
-                      padding: const EdgeInsets.all(20),
-                      itemCount: _notifications.length,
-                      itemBuilder: (context, index) {
-                        final notification = _notifications[index];
-                        return _buildNotificationCard(notification, index);
-                      },
+            // Custom App Bar
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                children: [
+                  const SizedBox(width: 48), // Spacer to center the title
+                  Expanded(
+                    child: Column(
+                      children: [
+                        Text(
+                          'Notifications',
+                          style: GoogleFonts.poppins(
+                            color: const Color(0xFF1A1A1A),
+                            fontWeight: FontWeight.w700,
+                            fontSize: 20,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        if (_notifications.isNotEmpty)
+                          FutureBuilder<int>(
+                            future: NotificationService.getUnreadCount(),
+                            builder: (context, snapshot) {
+                              final unreadCount = snapshot.data ?? 0;
+                              return Text(
+                                unreadCount > 0 
+                                    ? '$unreadCount unread'
+                                    : 'All caught up!',
+                                style: GoogleFonts.inter(
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 12,
+                                  color: const Color(0xFF757575),
+                                ),
+                              );
+                            },
+                          ),
+                      ],
                     ),
                   ),
-                ),
-      floatingActionButton: FloatingActionButton.extended(
-        heroTag: "add_notification_fab",
-        onPressed: _addSampleNotification,
-        backgroundColor: const Color(0xFF2E7D32),
-        foregroundColor: Colors.white,
-        icon: const Icon(Icons.add_rounded),
-        label: Text(
-          'Add Sample',
-          style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                  const SizedBox(width: 48),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Expanded(
+              child: _isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                        color: Color(0xFF5B4FCF),
+                      ),
+                    )
+                  : _notifications.isEmpty
+                      ? _buildEmptyState()
+                      : FadeTransition(
+                          opacity: _fadeAnimation,
+                          child: RefreshIndicator(
+                            onRefresh: _loadNotifications,
+                            color: const Color(0xFF5B4FCF),
+                            child: ListView.builder(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              itemCount: _notifications.length,
+                              itemBuilder: (context, index) {
+                                final notification = _notifications[index];
+                                return _buildNotificationCard(notification, index);
+                              },
+                            ),
+                          ),
+                        ),
+            ),
+          ],
         ),
       ),
     );
@@ -197,50 +214,32 @@ class _NotificationsScreenState extends State<NotificationsScreen>
             Container(
               padding: const EdgeInsets.all(32),
               decoration: BoxDecoration(
-                color: const Color(0xFF4CAF50).withOpacity(0.1),
+                color: const Color(0xFF5B4FCF).withOpacity(0.08),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.notifications_none_rounded,
-                size: 80,
-                color: Colors.grey[400],
+                size: 64,
+                color: Color(0xFF5B4FCF),
               ),
             ),
             const SizedBox(height: 24),
             Text(
-              'No Notifications',
-              style: GoogleFonts.inter(
-                fontSize: 24,
+              'No Notifications Yet',
+              style: GoogleFonts.poppins(
+                fontSize: 22,
                 fontWeight: FontWeight.w600,
-                color: Colors.grey[700],
+                color: const Color(0xFF1A1A1A),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             Text(
-              'You\'ll receive notifications about weather updates, '
-              'plant care reminders, and helpful tips here.',
+              'You\'ll receive notifications about\nweather and plant care here',
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
-                fontSize: 16,
-                color: Colors.grey[600],
+                fontSize: 14,
+                color: const Color(0xFF757575),
                 height: 1.5,
-              ),
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton.icon(
-              onPressed: _addSampleNotification,
-              icon: const Icon(Icons.add_rounded),
-              label: Text(
-                'Add Sample Notification',
-                style: GoogleFonts.inter(fontWeight: FontWeight.w600),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2E7D32),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
               ),
             ),
           ],
@@ -260,36 +259,39 @@ class _NotificationsScreenState extends State<NotificationsScreen>
           margin: const EdgeInsets.only(bottom: 16),
           padding: const EdgeInsets.symmetric(horizontal: 20),
           decoration: BoxDecoration(
-            color: Colors.red,
+            color: const Color(0xFFE57373),
             borderRadius: BorderRadius.circular(16),
           ),
           alignment: Alignment.centerRight,
           child: const Icon(
-            Icons.delete_rounded,
+            Icons.delete_outline_rounded,
             color: Colors.white,
-            size: 28,
+            size: 24,
           ),
         ),
         onDismissed: (_) => _deleteNotification(notification),
-        child: InkWell(
-          onTap: () => _markAsRead(notification),
-          borderRadius: BorderRadius.circular(16),
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: notification.isRead ? Colors.white : Colors.blue[50],
-              borderRadius: BorderRadius.circular(16),
-              border: notification.isRead 
-                  ? null 
-                  : Border.all(color: Colors.blue[200]!, width: 1),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 20,
-                  offset: const Offset(0, 5),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => _markAsRead(notification),
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: notification.isRead ? const Color(0xFFE0E0E0) : const Color(0xFF5B4FCF).withOpacity(0.3),
+                  width: 1,
                 ),
-              ],
-            ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.04),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -318,10 +320,10 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                               Expanded(
                                 child: Text(
                                   notification.title,
-                                  style: GoogleFonts.inter(
-                                    fontSize: 16,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 15,
                                     fontWeight: FontWeight.w600,
-                                    color: Colors.grey[800],
+                                    color: const Color(0xFF1A1A1A),
                                   ),
                                 ),
                               ),
@@ -329,68 +331,65 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                                 Container(
                                   width: 8,
                                   height: 8,
-                                  decoration: const BoxDecoration(
-                                    color: Colors.blue,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF5B4FCF),
                                     shape: BoxShape.circle,
                                   ),
                                 ),
                             ],
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            _formatTimestamp(notification.timestamp),
-                            style: GoogleFonts.inter(
-                              fontSize: 12,
-                              color: Colors.grey[500],
-                            ),
+                          const SizedBox(height: 2),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.schedule_rounded,
+                                size: 12,
+                                color: const Color(0xFF9E9E9E),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                _formatTimestamp(notification.timestamp),
+                                style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  color: const Color(0xFF757575),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 Text(
                   notification.message,
                   style: GoogleFonts.inter(
-                    fontSize: 14,
-                    color: Colors.grey[700],
+                    fontSize: 13,
+                    color: const Color(0xFF757575),
                     height: 1.4,
                   ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: _getNotificationColor(notification.type).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        _getNotificationTypeLabel(notification.type),
-                        style: GoogleFonts.inter(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                          color: _getNotificationColor(notification.type),
-                        ),
-                      ),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: _getNotificationColor(notification.type).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    _getNotificationTypeLabel(notification.type),
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      color: _getNotificationColor(notification.type),
                     ),
-                    const Spacer(),
-                    if (!notification.isRead)
-                      TextButton(
-                        onPressed: () => _markAsRead(notification),
-                        child: Text(
-                          'Mark as read',
-                          style: GoogleFonts.inter(
-                            fontSize: 12,
-                            color: const Color(0xFF2E7D32),
-                          ),
-                        ),
-                      ),
-                  ],
+                  ),
                 ),
               ],
+            ),
             ),
           ),
         ),
@@ -414,13 +413,13 @@ class _NotificationsScreenState extends State<NotificationsScreen>
   Color _getNotificationColor(String type) {
     switch (type) {
       case 'weather':
-        return Colors.orange;
+        return const Color(0xFFFF8F00);
       case 'care':
-        return Colors.blue;
+        return const Color(0xFF00ACC1);
       case 'general':
-        return const Color(0xFF2E7D32);
+        return const Color(0xFF5B4FCF);
       default:
-        return Colors.grey;
+        return const Color(0xFF757575);
     }
   }
 
