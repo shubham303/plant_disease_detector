@@ -90,7 +90,7 @@ class _PlantScanWidgetState extends State<PlantScanWidget> with SingleTickerProv
         if (widget.title.isNotEmpty) ...[
           Text(
             widget.title,
-            style: context.textTheme.titleMedium?.copyWith(
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
               color: const Color(0xFF424242),
             ),
