@@ -55,7 +55,7 @@ class _ChatHomeScreenState extends State<ChatHomeScreen> with TickerProviderStat
   void _addWelcomeMessage() {
     final welcomeMessage = ChatMessage(
       id: const Uuid().v4(),
-      content: 'Hello! 👋 I\'m your plant care assistant. How can I help you today?',
+      content: 'Hello! I\'m your plant care assistant. How can I help you today?\n\nI can help you with:\n• Plant identification and care tips\n• Disease diagnosis from photos\n• Watering and fertilizing schedules\n• General gardening advice',
       isUser: false,
       timestamp: DateTime.now(),
     );
@@ -219,6 +219,7 @@ class _ChatHomeScreenState extends State<ChatHomeScreen> with TickerProviderStat
       onImagesSelected: _onImageSelected,
       title: 'Add Image',
       allowMultiple: false, // Chat typically uses single images
+      primaryColor: const Color(0xFF5B4FCF),
     );
   }
 
@@ -289,9 +290,9 @@ class _ChatHomeScreenState extends State<ChatHomeScreen> with TickerProviderStat
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Colors.red,
+        backgroundColor: const Color(0xFFE57373),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
   }
@@ -299,124 +300,181 @@ class _ChatHomeScreenState extends State<ChatHomeScreen> with TickerProviderStat
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFDF7),
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFFE8E8E8),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(
-                Icons.smart_toy_rounded,
-                color: Color(0xFF2D2D2D),
-                size: 24,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Plant Care Assistant',
-                  style: GoogleFonts.inter(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                    color: const Color(0xFF2D2D2D),
-                  ),
-                ),
-                Text(
-                  'Online',
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: const Color(0xFF8E8E8E),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-        backgroundColor: const Color(0xFFFFFDF7),
-        foregroundColor: const Color(0xFF2D2D2D),
-        elevation: 0,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Container(
-            height: 1,
-            color: const Color(0xFFE8E8E8),
-          ),
-        ),
-      ),
-      body: Column(
-        children: [
-          // Chat messages
-          Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.all(16),
-              itemCount: _messages.length + (_isLoading ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (_isLoading && index == _messages.length) {
-                  return _buildLoadingMessage();
-                }
-                return _buildMessageBubble(_messages[index]);
-              },
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/kevin-mueller-QGSrJHopKwY-unsplash.jpg'),
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              Colors.white.withOpacity(0.95),
+              BlendMode.overlay,
             ),
           ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Custom App Bar
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.95),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 15,
+                              offset: const Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          color: Color(0xFF5B4FCF),
+                          size: 20,
+                        ),
+                      ),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Plant Care Assistant',
+                            style: GoogleFonts.poppins(
+                              color: const Color(0xFF1A1A1A),
+                              fontWeight: FontWeight.w700,
+                              fontSize: 18,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 8,
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF4CAF50),
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Online',
+                                style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  color: const Color(0xFF4CAF50),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF5B4FCF), Color(0xFF7C6FE8)],
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF5B4FCF).withOpacity(0.3),
+                            blurRadius: 15,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.smart_toy_rounded,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Chat messages
+              Expanded(
+                child: ListView.builder(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.all(16),
+                  itemCount: _messages.length + (_isLoading ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (_isLoading && index == _messages.length) {
+                      return _buildLoadingMessage();
+                    }
+                    return _buildMessageBubble(_messages[index]);
+                  },
+                ),
+              ),
           
-          // Loading indicator when typing
-          if (_isLoading)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                children: [
-                  const SizedBox(width: 48),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF5F5DC),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: const Color(0xFFE8E8E8)),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2D2D2D)),
-                          ),
+              // Loading indicator when typing
+              if (_isLoading)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 48),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF5B4FCF).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: const Color(0xFF5B4FCF).withOpacity(0.3)),
                         ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Typing...',
-                          style: GoogleFonts.inter(
-                            color: const Color(0xFF2D2D2D),
-                            fontSize: 14,
-                          ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF5B4FCF)),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Typing...',
+                              style: GoogleFonts.inter(
+                                color: const Color(0xFF5B4FCF),
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
+                ),
 
-          // Input area
-          Container(
-            decoration: const BoxDecoration(
-              border: Border(
-                top: BorderSide(color: Color(0xFFE8E8E8), width: 1),
-              ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
+              // Input area
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.95),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 15,
+                      offset: const Offset(0, -5),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
                   // Image preview if selected
                   if (_selectedImageFile != null || _selectedWebImageBytes != null) ...[
                     Container(
@@ -476,78 +534,100 @@ class _ChatHomeScreenState extends State<ChatHomeScreen> with TickerProviderStat
                   // Input row
                   Row(
                     children: [
-                      // Image picker button
-                      Container(
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF5F5DC),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: const Color(0xFFE8E8E8)),
-                        ),
-                        child: IconButton(
-                          onPressed: _showImageSourceDialog,
-                          icon: const Icon(
-                            Icons.add_a_photo_rounded,
-                            color: Color(0xFF2D2D2D),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      
-                      // Text input
-                      Expanded(
-                        child: Container(
+                        // Image picker button
+                        Container(
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFFFDF7),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: const Color(0xFFE8E8E8)),
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF5B4FCF), Color(0xFF7C6FE8)],
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF5B4FCF).withOpacity(0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                           ),
-                          child: TextField(
-                            controller: _textController,
-                            focusNode: _focusNode,
-                            decoration: InputDecoration(
-                              hintText: 'Ask about your plants...',
-                              hintStyle: GoogleFonts.inter(
-                                color: const Color(0xFF8E8E8E),
-                              ),
-                              border: InputBorder.none,
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
-                              ),
+                          child: IconButton(
+                            onPressed: _showImageSourceDialog,
+                            icon: const Icon(
+                              Icons.add_a_photo_rounded,
+                              color: Colors.white,
+                              size: 20,
                             ),
-                            style: GoogleFonts.inter(
-                              color: const Color(0xFF2D2D2D),
-                            ),
-                            maxLines: null,
-                            textCapitalization: TextCapitalization.sentences,
-                            onSubmitted: (text) => _sendMessage(),
                           ),
                         ),
-                      ),
                       const SizedBox(width: 12),
                       
-                      // Send button
-                      Container(
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF5F5DC),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: const Color(0xFFE8E8E8)),
-                        ),
-                        child: IconButton(
-                          onPressed: () => _sendMessage(),
-                          icon: const Icon(
-                            Icons.send_rounded,
-                            color: Color(0xFF2D2D2D),
+                        // Text input
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF5F7FA),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: const Color(0xFF5B4FCF).withOpacity(0.2)),
+                            ),
+                            child: TextField(
+                              controller: _textController,
+                              focusNode: _focusNode,
+                              decoration: InputDecoration(
+                                hintText: 'Ask about your plants...',
+                                hintStyle: GoogleFonts.inter(
+                                  color: const Color(0xFF9E9E9E),
+                                  fontSize: 14,
+                                ),
+                                border: InputBorder.none,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                              ),
+                              style: GoogleFonts.inter(
+                                color: const Color(0xFF424242),
+                                fontSize: 14,
+                              ),
+                              maxLines: null,
+                              textCapitalization: TextCapitalization.sentences,
+                              onSubmitted: (text) => _sendMessage(),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      const SizedBox(width: 12),
+                      
+                        // Send button
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF5B4FCF), Color(0xFF7C6FE8)],
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF5B4FCF).withOpacity(0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: IconButton(
+                            onPressed: () => _sendMessage(),
+                            icon: const Icon(
+                              Icons.send_rounded,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -557,22 +637,41 @@ class _ChatHomeScreenState extends State<ChatHomeScreen> with TickerProviderStat
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         children: [
-          CircleAvatar(
-            radius: 16,
-            backgroundColor: const Color(0xFFE8E8E8),
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF5B4FCF), Color(0xFF7C6FE8)],
+              ),
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF5B4FCF).withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
             child: const Icon(
               Icons.smart_toy_rounded,
-              color: Color(0xFF2D2D2D),
-              size: 16,
+              color: Colors.white,
+              size: 18,
             ),
           ),
           const SizedBox(width: 12),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: const Color(0xFFF5F5DC),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFFE8E8E8)),
+              color: Colors.white.withOpacity(0.95),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
+                ),
+              ],
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -581,16 +680,17 @@ class _ChatHomeScreenState extends State<ChatHomeScreen> with TickerProviderStat
                   width: 16,
                   height: 16,
                   child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2D2D2D)),
+                    strokeWidth: 2.5,
+                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF5B4FCF)),
                   ),
                 ),
                 const SizedBox(width: 8),
                 Text(
                   'Thinking...',
                   style: GoogleFonts.inter(
-                    color: const Color(0xFF2D2D2D),
-                    fontSize: 14,
+                    color: const Color(0xFF5B4FCF),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
@@ -608,18 +708,31 @@ class _ChatHomeScreenState extends State<ChatHomeScreen> with TickerProviderStat
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!message.isUser) ...[
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: const Color(0xFFE8E8E8),
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF5B4FCF), Color(0xFF7C6FE8)],
+                ),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF5B4FCF).withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
               child: const Icon(
                 Icons.smart_toy_rounded,
-                color: Color(0xFF2D2D2D),
-                size: 16,
+                color: Colors.white,
+                size: 18,
               ),
             ),
             const SizedBox(width: 12),
           ] else
-            const SizedBox(width: 44),
+            const SizedBox(width: 48),
           
           Expanded(
             child: Column(
@@ -634,10 +747,18 @@ class _ChatHomeScreenState extends State<ChatHomeScreen> with TickerProviderStat
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: message.isUser 
-                        ? const Color(0xFFF5F5DC)
-                        : const Color(0xFFFFFDF7),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFFE8E8E8)),
+                        ? const Color(0xFF5B4FCF).withOpacity(0.1)
+                        : Colors.white.withOpacity(0.95),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: message.isUser
+                            ? const Color(0xFF5B4FCF).withOpacity(0.1)
+                            : Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -682,7 +803,7 @@ class _ChatHomeScreenState extends State<ChatHomeScreen> with TickerProviderStat
                             ? Text(
                                 message.content,
                                 style: GoogleFonts.inter(
-                                  color: const Color(0xFF2D2D2D),
+                                  color: const Color(0xFF424242),
                                   fontSize: 14,
                                 ),
                               )
@@ -690,32 +811,39 @@ class _ChatHomeScreenState extends State<ChatHomeScreen> with TickerProviderStat
                                 data: message.content,
                                 styleSheet: MarkdownStyleSheet(
                                   p: GoogleFonts.inter(
-                                    color: const Color(0xFF2D2D2D),
+                                    color: const Color(0xFF5A5A5A),
                                     fontSize: 14,
+                                    height: 1.6,
                                   ),
-                                  h1: GoogleFonts.inter(
-                                    color: const Color(0xFF2D2D2D),
+                                  h1: GoogleFonts.poppins(
+                                    color: const Color(0xFF1A1A1A),
                                     fontSize: 18,
                                     fontWeight: FontWeight.w600,
                                   ),
-                                  h2: GoogleFonts.inter(
-                                    color: const Color(0xFF2D2D2D),
+                                  h2: GoogleFonts.poppins(
+                                    color: const Color(0xFF2C2C2C),
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                   ),
-                                  h3: GoogleFonts.inter(
-                                    color: const Color(0xFF2D2D2D),
+                                  h3: GoogleFonts.poppins(
+                                    color: const Color(0xFF424242),
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
                                   ),
                                   listBullet: GoogleFonts.inter(
-                                    color: const Color(0xFF2D2D2D),
-                                    fontSize: 14,
-                                  ),
-                                  strong: GoogleFonts.inter(
-                                    color: const Color(0xFF2D2D2D),
+                                    color: const Color(0xFF5B4FCF),
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
+                                  ),
+                                  strong: GoogleFonts.inter(
+                                    color: const Color(0xFF2C2C2C),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  code: GoogleFonts.sourceCodePro(
+                                    fontSize: 13,
+                                    backgroundColor: const Color(0xFF5B4FCF).withOpacity(0.08),
+                                    color: const Color(0xFF5B4FCF),
                                   ),
                                 ),
                               ),
@@ -736,13 +864,21 @@ class _ChatHomeScreenState extends State<ChatHomeScreen> with TickerProviderStat
           
           if (message.isUser) ...[
             const SizedBox(width: 12),
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: const Color(0xFFE8E8E8),
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: const Color(0xFF4CAF50).withOpacity(0.1),
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: const Color(0xFF4CAF50).withOpacity(0.3),
+                  width: 1.5,
+                ),
+              ),
               child: const Icon(
                 Icons.person_rounded,
-                color: Color(0xFF2D2D2D),
-                size: 16,
+                color: Color(0xFF4CAF50),
+                size: 18,
               ),
             ),
           ],

@@ -68,27 +68,115 @@ class _MyPlantsScreenState extends State<MyPlantsScreen> with TickerProviderStat
   Future<void> _deletePlant(Plant plant) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          'Delete Plant',
-          style: GoogleFonts.inter(fontWeight: FontWeight.w600),
-        ),
-        content: Text(
-          'Are you sure you want to delete ${plant.name}? This action cannot be undone.',
-          style: GoogleFonts.inter(),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.9,
           ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete'),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE57373).withOpacity(0.1),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE57373).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.delete_outline_rounded,
+                        color: Color(0xFFE57373),
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Delete Plant',
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF1A1A1A),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Content
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Text(
+                  'Are you sure you want to delete ${plant.name}? This action cannot be undone.',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    color: const Color(0xFF757575),
+                    height: 1.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              
+              // Actions
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: Text(
+                          'Cancel',
+                          style: GoogleFonts.inter(
+                            color: const Color(0xFF757575),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFE57373),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: Text(
+                          'Delete',
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
 
@@ -99,7 +187,7 @@ class _MyPlantsScreenState extends State<MyPlantsScreen> with TickerProviderStat
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('${plant.name} deleted successfully'),
-            backgroundColor: Colors.green,
+            backgroundColor: const Color(0xFF4CAF50),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
@@ -111,58 +199,139 @@ class _MyPlantsScreenState extends State<MyPlantsScreen> with TickerProviderStat
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        title: Text(
-          'My Plants',
-          style: GoogleFonts.inter(
-            fontWeight: FontWeight.w700,
-            fontSize: 24,
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/markus-spiske-sFydXGrt5OA-unsplash.jpg'),
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              Colors.white.withOpacity(0.95),
+              BlendMode.overlay,
+            ),
           ),
         ),
-        backgroundColor: const Color(0xFF2E7D32),
-        foregroundColor: Colors.white,
-        elevation: 0,
-        actions: [
-          IconButton(
-            onPressed: _addPlant,
-            icon: const Icon(Icons.add_rounded),
-            tooltip: 'Add Plant',
-          ),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(
-                color: Color(0xFF2E7D32),
-              ),
-            )
-          : _plants.isEmpty
-              ? _buildEmptyState()
-              : FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: RefreshIndicator(
-                    onRefresh: _loadPlants,
-                    color: const Color(0xFF2E7D32),
-                    child: ListView.builder(
-                      padding: const EdgeInsets.all(20),
-                      itemCount: _plants.length,
-                      itemBuilder: (context, index) {
-                        final plant = _plants[index];
-                        return _buildPlantCard(plant, index);
-                      },
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Custom App Bar
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.95),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 15,
+                              offset: const Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          color: Color(0xFF5B4FCF),
+                          size: 20,
+                        ),
+                      ),
+                      onPressed: () => Navigator.of(context).pop(),
                     ),
-                  ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'My Plants',
+                        style: GoogleFonts.poppins(
+                          color: const Color(0xFF1A1A1A),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 20,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    IconButton(
+                      icon: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.95),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 15,
+                              offset: const Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.add_rounded,
+                          color: Color(0xFF5B4FCF),
+                          size: 20,
+                        ),
+                      ),
+                      onPressed: _addPlant,
+                      tooltip: 'Add Plant',
+                    ),
+                  ],
                 ),
-      floatingActionButton: FloatingActionButton.extended(
-        heroTag: "add_plant_fab",
-        onPressed: _addPlant,
-        backgroundColor: const Color(0xFF2E7D32),
-        foregroundColor: Colors.white,
-        icon: const Icon(Icons.add_rounded),
-        label: Text(
-          'Add Plant',
-          style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+              ),
+              Expanded(
+                child: _isLoading
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                          color: Color(0xFF5B4FCF),
+                        ),
+                      )
+                    : _plants.isEmpty
+                        ? _buildEmptyState()
+                        : FadeTransition(
+                            opacity: _fadeAnimation,
+                            child: RefreshIndicator(
+                              onRefresh: _loadPlants,
+                              color: const Color(0xFF5B4FCF),
+                              child: ListView.builder(
+                                padding: const EdgeInsets.all(16),
+                                itemCount: _plants.length,
+                                itemBuilder: (context, index) {
+                                  final plant = _plants[index];
+                                  return _buildPlantCard(plant, index);
+                                },
+                              ),
+                            ),
+                          ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      floatingActionButton: Container(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF5B4FCF), Color(0xFF7C6FE8)],
+          ),
+          borderRadius: BorderRadius.circular(30),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF5B4FCF).withOpacity(0.3),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: FloatingActionButton.extended(
+          heroTag: "add_plant_fab",
+          onPressed: _addPlant,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          foregroundColor: Colors.white,
+          icon: const Icon(Icons.add_rounded),
+          label: Text(
+            'Add Plant',
+            style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          ),
         ),
       ),
     );
@@ -176,24 +345,29 @@ class _MyPlantsScreenState extends State<MyPlantsScreen> with TickerProviderStat
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(32),
+              padding: const EdgeInsets.all(40),
               decoration: BoxDecoration(
-                color: const Color(0xFF4CAF50).withOpacity(0.1),
+                gradient: LinearGradient(
+                  colors: [
+                    const Color(0xFF5B4FCF).withOpacity(0.1),
+                    const Color(0xFF7C6FE8).withOpacity(0.05),
+                  ],
+                ),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.local_florist_rounded,
                 size: 80,
-                color: Colors.grey[400],
+                color: Color(0xFF5B4FCF),
               ),
             ),
             const SizedBox(height: 24),
             Text(
               'No Plants Yet',
-              style: GoogleFonts.inter(
+              style: GoogleFonts.poppins(
                 fontSize: 24,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey[700],
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF1A1A1A),
               ),
             ),
             const SizedBox(height: 12),
@@ -201,25 +375,53 @@ class _MyPlantsScreenState extends State<MyPlantsScreen> with TickerProviderStat
               'Start building your plant collection by adding your first plant!',
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
-                fontSize: 16,
-                color: Colors.grey[600],
+                fontSize: 15,
+                color: const Color(0xFF757575),
                 height: 1.5,
               ),
             ),
             const SizedBox(height: 32),
-            ElevatedButton.icon(
-              onPressed: _addPlant,
-              icon: const Icon(Icons.add_rounded),
-              label: Text(
-                'Add Your First Plant',
-                style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+            Container(
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF5B4FCF), Color(0xFF7C6FE8)],
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF5B4FCF).withOpacity(0.3),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
               ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2E7D32),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: _addPlant,
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.add_rounded,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Add Your First Plant',
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -245,17 +447,17 @@ class _MyPlantsScreenState extends State<MyPlantsScreen> with TickerProviderStat
             _loadPlants();
           }
         },
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         child: Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
+            color: Colors.white.withOpacity(0.95),
+            borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 20,
-                offset: const Offset(0, 5),
+                color: const Color(0xFF5B4FCF).withOpacity(0.1),
+                blurRadius: 30,
+                offset: const Offset(0, 10),
               ),
             ],
           ),
@@ -297,18 +499,18 @@ class _MyPlantsScreenState extends State<MyPlantsScreen> with TickerProviderStat
                   children: [
                     Text(
                       plant.name,
-                      style: GoogleFonts.inter(
-                        fontSize: 18,
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: Colors.grey[800],
+                        color: const Color(0xFF1A1A1A),
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       'Added ${_formatDate(plant.dateAdded)}',
                       style: GoogleFonts.inter(
-                        fontSize: 14,
-                        color: Colors.grey[600],
+                        fontSize: 13,
+                        color: const Color(0xFF757575),
                       ),
                     ),
                     if (plant.notes != null && plant.notes!.isNotEmpty) ...[
@@ -318,8 +520,8 @@ class _MyPlantsScreenState extends State<MyPlantsScreen> with TickerProviderStat
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.inter(
-                          fontSize: 13,
-                          color: Colors.grey[500],
+                          fontSize: 12,
+                          color: const Color(0xFF9E9E9E),
                         ),
                       ),
                     ],
@@ -331,32 +533,41 @@ class _MyPlantsScreenState extends State<MyPlantsScreen> with TickerProviderStat
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF4CAF50).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF5B4FCF), Color(0xFF7C6FE8)],
+                      ),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Icon(
                       Icons.chevron_right_rounded,
-                      color: Color(0xFF2E7D32),
+                      color: Colors.white,
+                      size: 20,
                     ),
                   ),
                   const SizedBox(height: 8),
                   PopupMenuButton<String>(
                     icon: Icon(
                       Icons.more_vert_rounded,
-                      color: Colors.grey[600],
+                      color: const Color(0xFF9E9E9E),
                       size: 20,
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
+                    elevation: 8,
                     itemBuilder: (context) => [
                       PopupMenuItem(
                         value: 'delete',
                         child: Row(
                           children: [
-                            Icon(Icons.delete_outline_rounded, color: Colors.red[400]),
+                            Icon(Icons.delete_outline_rounded, color: const Color(0xFFE57373)),
                             const SizedBox(width: 8),
-                            const Text('Delete'),
+                            Text(
+                              'Delete',
+                              style: GoogleFonts.inter(
+                                color: const Color(0xFF424242),
+                              ),
+                            ),
                           ],
                         ),
                       ),

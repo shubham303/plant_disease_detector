@@ -230,7 +230,7 @@ class ImagePickerWidget extends StatelessWidget {
     BuildContext context, {
     required Function(List<XFile> images) onImagesSelected,
     String title = 'Add Images',
-    bool allowMultiple = true,
+    bool allowMultiple = true, required Color primaryColor,
   }) {
     showModalBottomSheet(
       context: context,

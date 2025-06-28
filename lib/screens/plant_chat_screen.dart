@@ -71,6 +71,7 @@ class _PlantChatScreenState extends State<PlantChatScreen>
       onImagesSelected: _onImagesSelected,
       title: 'Add Images to Chat',
       allowMultiple: true,
+      primaryColor: const Color(0xFF4CAF50),
     );
   }
 
@@ -165,45 +166,150 @@ class _PlantChatScreenState extends State<PlantChatScreen>
   void _showAddMoreDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          'Add More Photos?',
-          style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.9,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color(0xFF5B4FCF).withOpacity(0.08),
+                      const Color(0xFF7C6FE8).withOpacity(0.05),
+                    ],
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF5B4FCF).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.add_a_photo_rounded,
+                        color: Color(0xFF5B4FCF),
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Add More Photos?',
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF1A1A1A),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Content
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Text(
+                  'Would you like to take another photo or select from gallery?',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    color: const Color(0xFF757575),
+                    height: 1.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              
+              // Actions
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: Text(
+                          'Done',
+                          style: GoogleFonts.inter(
+                            color: const Color(0xFF757575),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          _pickFromCamera();
+                        },
+                        icon: const Icon(Icons.camera_alt_rounded, size: 18),
+                        label: Text(
+                          'Camera',
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF4CAF50),
+                          side: BorderSide(
+                            color: const Color(0xFF4CAF50).withOpacity(0.3),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          _pickFromGallery();
+                        },
+                        icon: const Icon(Icons.photo_library_rounded, size: 18),
+                        label: Text(
+                          'Gallery',
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF4CAF50),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
-        content: Text(
-          'Would you like to take another photo or select from gallery?',
-          style: GoogleFonts.inter(),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(
-              'Done',
-              style: GoogleFonts.inter(color: Colors.grey[600]),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _pickFromCamera();
-            },
-            child: Text(
-              'Camera',
-              style: GoogleFonts.inter(color: const Color(0xFF2E7D32)),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _pickFromGallery();
-            },
-            child: Text(
-              'Gallery',
-              style: GoogleFonts.inter(color: const Color(0xFF2E7D32)),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -222,16 +328,93 @@ class _PlantChatScreenState extends State<PlantChatScreen>
   void _showErrorDialog(String message) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('Error', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
-        content: Text(message, style: GoogleFonts.inter()),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK'),
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.9,
           ),
-        ],
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFEBEE),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE57373).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.error_outline_rounded,
+                        color: Color(0xFFE57373),
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Error',
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF1A1A1A),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Content
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Text(
+                  message,
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    color: const Color(0xFF757575),
+                    height: 1.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              
+              // Action
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF5B4FCF),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: Text(
+                      'OK',
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -378,53 +561,106 @@ class _PlantChatScreenState extends State<PlantChatScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Plant Assistant',
-              style: GoogleFonts.inter(
-                fontWeight: FontWeight.w700,
-                fontSize: 18,
-              ),
-            ),
-            Text(
-              widget.plant.name,
-              style: GoogleFonts.inter(
-                fontWeight: FontWeight.w400,
-                fontSize: 14,
-                color: Colors.white.withOpacity(0.9),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: const Color(0xFF2E7D32),
-        foregroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          onPressed: () => Navigator.of(context).pop(),
-          icon: const Icon(Icons.arrow_back_rounded),
-        ),
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.all(16),
-              itemCount: _messages.length + (_isTyping ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (index == _messages.length && _isTyping) {
-                  return _buildTypingIndicator();
-                }
-                return _buildMessageBubble(_messages[index]);
-              },
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/kevin-mueller-QGSrJHopKwY-unsplash.jpg'),
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              Colors.white.withOpacity(0.95),
+              BlendMode.overlay,
             ),
           ),
-          _buildMessageInput(),
-        ],
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Custom App Bar
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.95),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 15,
+                              offset: const Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          color: Color(0xFF5B4FCF),
+                          size: 20,
+                        ),
+                      ),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Plant Assistant',
+                            style: GoogleFonts.poppins(
+                              color: const Color(0xFF1A1A1A),
+                              fontWeight: FontWeight.w700,
+                              fontSize: 18,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            widget.plant.name,
+                            style: GoogleFonts.inter(
+                              fontSize: 13,
+                              color: const Color(0xFF757575),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF4CAF50).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: const Color(0xFF4CAF50).withOpacity(0.3),
+                        ),
+                      ),
+                      child: const Icon(
+                        Icons.eco_rounded,
+                        color: Color(0xFF4CAF50),
+                        size: 24,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.all(16),
+                  itemCount: _messages.length + (_isTyping ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (index == _messages.length && _isTyping) {
+                      return _buildTypingIndicator();
+                    }
+                    return _buildMessageBubble(_messages[index]);
+                  },
+                ),
+              ),
+              _buildMessageInput(),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -439,15 +675,25 @@ class _PlantChatScreenState extends State<PlantChatScreen>
         children: [
           if (!message.isUser) ...[
             Container(
-              padding: const EdgeInsets.all(8),
+              width: 36,
+              height: 36,
               decoration: BoxDecoration(
-                color: const Color(0xFF4CAF50).withOpacity(0.1),
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF4CAF50), Color(0xFF66BB6A)],
+                ),
                 shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF4CAF50).withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: const Icon(
                 Icons.smart_toy_rounded,
-                color: Color(0xFF2E7D32),
-                size: 20,
+                color: Colors.white,
+                size: 18,
               ),
             ),
             const SizedBox(width: 12),
@@ -457,21 +703,23 @@ class _PlantChatScreenState extends State<PlantChatScreen>
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
                 color: message.isUser
-                    ? const Color(0xFF2E7D32)
-                    : Colors.white,
-                borderRadius: BorderRadius.circular(16).copyWith(
+                    ? const Color(0xFF5B4FCF).withOpacity(0.1)
+                    : Colors.white.withOpacity(0.95),
+                borderRadius: BorderRadius.circular(20).copyWith(
                   bottomLeft: message.isUser
-                      ? const Radius.circular(16)
+                      ? const Radius.circular(20)
                       : const Radius.circular(4),
                   bottomRight: message.isUser
                       ? const Radius.circular(4)
-                      : const Radius.circular(16),
+                      : const Radius.circular(20),
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
+                    color: message.isUser
+                        ? const Color(0xFF5B4FCF).withOpacity(0.1)
+                        : Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),
@@ -534,9 +782,9 @@ class _PlantChatScreenState extends State<PlantChatScreen>
                     Text(
                       message.message,
                       style: GoogleFonts.inter(
-                        color: message.isUser ? Colors.white : Colors.grey[800],
+                        color: message.isUser ? const Color(0xFF424242) : const Color(0xFF5A5A5A),
                         fontSize: 14,
-                        height: 1.4,
+                        height: 1.6,
                       ),
                     ),
                 ],
@@ -546,15 +794,20 @@ class _PlantChatScreenState extends State<PlantChatScreen>
           if (message.isUser) ...[
             const SizedBox(width: 12),
             Container(
-              padding: const EdgeInsets.all(8),
+              width: 36,
+              height: 36,
               decoration: BoxDecoration(
-                color: const Color(0xFF2E7D32).withOpacity(0.1),
+                color: const Color(0xFF5B4FCF).withOpacity(0.1),
                 shape: BoxShape.circle,
+                border: Border.all(
+                  color: const Color(0xFF5B4FCF).withOpacity(0.3),
+                  width: 1.5,
+                ),
               ),
               child: const Icon(
                 Icons.person_rounded,
-                color: Color(0xFF2E7D32),
-                size: 20,
+                color: Color(0xFF5B4FCF),
+                size: 18,
               ),
             ),
           ],
@@ -569,33 +822,43 @@ class _PlantChatScreenState extends State<PlantChatScreen>
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            width: 36,
+            height: 36,
             decoration: BoxDecoration(
-              color: const Color(0xFF4CAF50).withOpacity(0.1),
+              gradient: const LinearGradient(
+                colors: [Color(0xFF4CAF50), Color(0xFF66BB6A)],
+              ),
               shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF4CAF50).withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: const Icon(
               Icons.smart_toy_rounded,
-              color: Color(0xFF2E7D32),
-              size: 20,
+              color: Colors.white,
+              size: 18,
             ),
           ),
           const SizedBox(width: 12),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Colors.white.withOpacity(0.95),
               borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
-                bottomRight: Radius.circular(16),
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+                bottomRight: Radius.circular(20),
                 bottomLeft: Radius.circular(4),
               ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.05),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
                 ),
               ],
             ),
@@ -644,12 +907,12 @@ class _PlantChatScreenState extends State<PlantChatScreen>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white.withOpacity(0.95),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
+            blurRadius: 15,
+            offset: const Offset(0, -5),
           ),
         ],
       ),
@@ -729,14 +992,24 @@ class _PlantChatScreenState extends State<PlantChatScreen>
                 // Image Button
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    shape: BoxShape.circle,
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF4CAF50), Color(0xFF66BB6A)],
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF4CAF50).withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                   child: IconButton(
                     onPressed: _showImageSourceDialog,
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.photo_camera_rounded,
-                      color: Colors.grey[600],
+                      color: Colors.white,
+                      size: 20,
                     ),
                   ),
                 ),
@@ -746,9 +1019,9 @@ class _PlantChatScreenState extends State<PlantChatScreen>
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.grey[50],
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: Colors.grey[200]!),
+                      color: const Color(0xFFF5F7FA),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: const Color(0xFF5B4FCF).withOpacity(0.2)),
                     ),
                     child: TextField(
                       controller: _messageController,
@@ -756,14 +1029,20 @@ class _PlantChatScreenState extends State<PlantChatScreen>
                         hintText: widget.plant.name == 'General Plant Care' 
                             ? 'Ask about plants or share images...'
                             : 'Ask about ${widget.plant.name} or share images...',
-                        hintStyle: GoogleFonts.inter(color: Colors.grey[500]),
+                        hintStyle: GoogleFonts.inter(
+                          color: const Color(0xFF9E9E9E),
+                          fontSize: 14,
+                        ),
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20,
+                          horizontal: 16,
                           vertical: 12,
                         ),
                       ),
-                      style: GoogleFonts.inter(),
+                      style: GoogleFonts.inter(
+                        color: const Color(0xFF424242),
+                        fontSize: 14,
+                      ),
                       maxLines: null,
                       textCapitalization: TextCapitalization.sentences,
                       onSubmitted: (_) => _sendMessage(),
@@ -774,15 +1053,25 @@ class _PlantChatScreenState extends State<PlantChatScreen>
                 
                 // Send Button
                 Container(
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF2E7D32),
-                    shape: BoxShape.circle,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF5B4FCF), Color(0xFF7C6FE8)],
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF5B4FCF).withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                   child: IconButton(
                     onPressed: _sendMessage,
                     icon: const Icon(
                       Icons.send_rounded,
                       color: Colors.white,
+                      size: 20,
                     ),
                   ),
                 ),

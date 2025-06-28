@@ -115,45 +115,150 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
   void _showAddMoreDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          'Add More Photos?',
-          style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.9,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color(0xFF5B4FCF).withOpacity(0.08),
+                      const Color(0xFF7C6FE8).withOpacity(0.05),
+                    ],
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF5B4FCF).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.add_a_photo_rounded,
+                        color: Color(0xFF5B4FCF),
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Add More Photos?',
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF1A1A1A),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Content
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Text(
+                  'Would you like to take another photo or select from gallery?',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    color: const Color(0xFF757575),
+                    height: 1.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              
+              // Actions
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: Text(
+                          'Done',
+                          style: GoogleFonts.inter(
+                            color: const Color(0xFF757575),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          _pickFromCamera();
+                        },
+                        icon: const Icon(Icons.camera_alt_rounded, size: 18),
+                        label: Text(
+                          'Camera',
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF5B4FCF),
+                          side: BorderSide(
+                            color: const Color(0xFF5B4FCF).withOpacity(0.3),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          _pickFromGallery();
+                        },
+                        icon: const Icon(Icons.photo_library_rounded, size: 18),
+                        label: Text(
+                          'Gallery',
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF5B4FCF),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
-        content: Text(
-          'Would you like to take another photo or select from gallery?',
-          style: GoogleFonts.inter(),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(
-              'Done',
-              style: GoogleFonts.inter(color: Colors.grey[600]),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _pickFromCamera();
-            },
-            child: Text(
-              'Camera',
-              style: GoogleFonts.inter(color: const Color(0xFF2E7D32)),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _pickFromGallery();
-            },
-            child: Text(
-              'Gallery',
-              style: GoogleFonts.inter(color: const Color(0xFF2E7D32)),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -185,6 +290,7 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
       onImagesSelected: _onImagesSelected,
       title: 'Add Plant Images',
       allowMultiple: true,
+      primaryColor: const Color(0xFF5B4FCF),
     );
   }
 
@@ -283,7 +389,7 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('${plant.name} added successfully!'),
-            backgroundColor: Colors.green,
+            backgroundColor: const Color(0xFF4CAF50),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
@@ -299,203 +405,401 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
   void _showErrorDialog(String message) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('Error', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
-        content: Text(message, style: GoogleFonts.inter()),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK'),
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.9,
           ),
-        ],
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFEBEE),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE57373).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.error_outline_rounded,
+                        color: Color(0xFFE57373),
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Error',
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF1A1A1A),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Content
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Text(
+                  message,
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    color: const Color(0xFF757575),
+                    height: 1.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              
+              // Action
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF5B4FCF),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: Text(
+                      'OK',
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        title: Text(
-          'Add New Plant',
-          style: GoogleFonts.inter(
-            fontWeight: FontWeight.w700,
-            fontSize: 20,
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/carlita-benazito-vnd50_tpkqg-unsplash.jpg'),
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              Colors.white.withOpacity(0.95),
+              BlendMode.overlay,
+            ),
           ),
         ),
-        backgroundColor: const Color(0xFF2E7D32),
-        foregroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          onPressed: () => Navigator.of(context).pop(),
-          icon: const Icon(Icons.arrow_back_rounded),
-        ),
-      ),
-      body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(color: Color(0xFF2E7D32)),
-            )
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Custom App Bar
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Row(
                   children: [
-                    // Image Selection Section
-                    Container(
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 20,
-                            offset: const Offset(0, 5),
-                          ),
-                        ],
+                    IconButton(
+                      icon: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.95),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 15,
+                              offset: const Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          color: Color(0xFF5B4FCF),
+                          size: 20,
+                        ),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Plant Photo',
-                            style: GoogleFonts.inter(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.grey[800],
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          GestureDetector(
-                            onTap: _showImageSourceDialog,
-                            child: Container(
-                              height: 200,
-                              decoration: BoxDecoration(
-                                color: Colors.grey[50],
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
-                                  color: Colors.grey[200]!,
-                                  style: BorderStyle.solid,
-                                  width: 2,
-                                ),
-                              ),
-                              child: _selectedImages.isNotEmpty || _selectedXFiles.isNotEmpty
-                                  ? _buildImageGrid()
-                                  : _buildImagePlaceholder(),
-                            ),
-                          ),
-                        ],
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Add New Plant',
+                        style: GoogleFonts.poppins(
+                          color: const Color(0xFF1A1A1A),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 18,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
                     ),
-
-                    const SizedBox(height: 20),
-
-                    // Plant Type Selection
-                    Container(
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 20,
-                            offset: const Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Plant Type',
-                            style: GoogleFonts.inter(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.grey[800],
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey[200]!),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: DropdownButtonFormField<String>(
-                              value: _selectedPlantType,
-                              decoration: const InputDecoration(
-                                border: InputBorder.none,
-                                contentPadding: EdgeInsets.symmetric(horizontal: 16),
-                              ),
-                              hint: Text(
-                                'Select plant type...',
-                                style: GoogleFonts.inter(color: Colors.grey[600]),
-                              ),
-                              items: _supportedPlants.map((String plant) {
-                                return DropdownMenuItem<String>(
-                                  value: plant,
-                                  child: Text(plant, style: GoogleFonts.inter()),
-                                );
-                              }).toList(),
-                              onChanged: (String? newValue) {
-                                setState(() {
-                                  _selectedPlantType = newValue;
-                                });
-                              },
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Please select a plant type';
-                                }
-                                return null;
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-
-                    const SizedBox(height: 20),
-
-                    // Plantation Date and Age
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
+                    const SizedBox(width: 56), // Balance for back button
+                  ],
+                ),
+              ),
+              Expanded(
+                child: _isLoading
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF5B4FCF)),
+                        ),
+                      )
+                    : SingleChildScrollView(
+                        padding: const EdgeInsets.all(16),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              Icon(
-                                Icons.schedule_rounded,
-                                color: const Color(0xFF2E7D32),
-                                size: 20,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Plantation Information',
-                                style: GoogleFonts.inter(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.grey[800],
+                              // Image Selection Section
+                              Container(
+                                padding: const EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.95),
+                                  borderRadius: BorderRadius.circular(24),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(0xFF5B4FCF).withOpacity(0.1),
+                                      blurRadius: 30,
+                                      offset: const Offset(0, 10),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFF5B4FCF).withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          child: const Icon(
+                                            Icons.photo_camera_rounded,
+                                            color: Color(0xFF5B4FCF),
+                                            size: 20,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Text(
+                                          'Plant Photo',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                            color: const Color(0xFF424242),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 16),
+                                    GestureDetector(
+                                      onTap: _showImageSourceDialog,
+                                      child: Container(
+                                        height: 180,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFF5F7FA),
+                                          borderRadius: BorderRadius.circular(16),
+                                          border: Border.all(
+                                            color: const Color(0xFF5B4FCF).withOpacity(0.2),
+                                            width: 2,
+                                          ),
+                                        ),
+                                        child: _selectedImages.isNotEmpty || _selectedXFiles.isNotEmpty
+                                            ? _buildImageGrid()
+                                            : _buildImagePlaceholder(),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
+
+                              const SizedBox(height: 16),
+
+                              // Plant Type Selection
+                              Container(
+                                padding: const EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.95),
+                                  borderRadius: BorderRadius.circular(24),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(0xFF5B4FCF).withOpacity(0.1),
+                                      blurRadius: 30,
+                                      offset: const Offset(0, 10),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFF5B4FCF).withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          child: const Icon(
+                                            Icons.local_florist_rounded,
+                                            color: Color(0xFF5B4FCF),
+                                            size: 20,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Text(
+                                          'Plant Type',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                            color: const Color(0xFF424242),
+                                          ),
+                                        ),
+                                        Text(
+                                          ' *',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                            color: const Color(0xFFE57373),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 16),
+                                    DropdownButtonFormField<String>(
+                                      value: _selectedPlantType,
+                                      decoration: InputDecoration(
+                                        hintText: 'Select your plant type',
+                                        hintStyle: GoogleFonts.inter(
+                                          color: const Color(0xFF9E9E9E),
+                                          fontSize: 14,
+                                        ),
+                                        filled: true,
+                                        fillColor: const Color(0xFFF5F7FA),
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                          borderSide: BorderSide.none,
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                          borderSide: BorderSide(
+                                            color: const Color(0xFF5B4FCF).withOpacity(0.1),
+                                          ),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                          borderSide: BorderSide(
+                                            color: const Color(0xFF5B4FCF).withOpacity(0.3),
+                                            width: 2,
+                                          ),
+                                        ),
+                                        contentPadding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 14,
+                                        ),
+                                      ),
+                                      dropdownColor: Colors.white,
+                                      icon: const Icon(
+                                        Icons.keyboard_arrow_down_rounded,
+                                        color: Color(0xFF757575),
+                                      ),
+                                      isExpanded: true,
+                                      items: _supportedPlants.map((String plant) {
+                                        return DropdownMenuItem<String>(
+                                          value: plant,
+                                          child: Text(
+                                            plant,
+                                            style: GoogleFonts.inter(
+                                              fontSize: 14,
+                                              color: const Color(0xFF424242),
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                      onChanged: (String? newValue) {
+                                        setState(() {
+                                          _selectedPlantType = newValue;
+                                        });
+                                      },
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Please select a plant type';
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+
+                              const SizedBox(height: 16),
+
+                              // Plantation Date and Age
+                              Container(
+                                padding: const EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.95),
+                                  borderRadius: BorderRadius.circular(24),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(0xFF5B4FCF).withOpacity(0.1),
+                                      blurRadius: 30,
+                                      offset: const Offset(0, 10),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFF5B4FCF).withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          child: const Icon(
+                                            Icons.schedule_rounded,
+                                            color: Color(0xFF5B4FCF),
+                                            size: 20,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Text(
+                                          'Plantation Information',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                            color: const Color(0xFF424242),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                           const SizedBox(height: 16),
                           
                           // Plantation Date
@@ -523,15 +827,20 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
                                 _calculateAge();
                               }
                             },
-                            child: Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey[300]!),
-                                borderRadius: BorderRadius.circular(8),
-                                color: Colors.grey[50],
-                              ),
-                              child: Row(
+                                      child: Container(
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 14,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFF5F7FA),
+                                          border: Border.all(
+                                            color: const Color(0xFF5B4FCF).withOpacity(0.1),
+                                          ),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: Row(
                                 children: [
                                   Icon(
                                     Icons.calendar_today,
@@ -566,24 +875,24 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
                               width: double.infinity,
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF2E7D32).withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(8),
+                                color: const Color(0xFF4CAF50).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
-                                  color: const Color(0xFF2E7D32).withOpacity(0.3),
+                                  color: const Color(0xFF4CAF50).withOpacity(0.3),
                                 ),
                               ),
                               child: Row(
                                 children: [
                                   Icon(
-                                    Icons.access_time,
+                                    Icons.access_time_rounded,
                                     size: 18,
-                                    color: const Color(0xFF2E7D32),
+                                    color: const Color(0xFF4CAF50),
                                   ),
                                   const SizedBox(width: 12),
                                   Text(
                                     'Plant age: $_ageInDays days old',
                                     style: GoogleFonts.inter(
-                                      color: const Color(0xFF2E7D32),
+                                      color: const Color(0xFF4CAF50),
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -591,58 +900,67 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
                                 ],
                               ),
                             ),
-                          ],
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // Growing Conditions
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.eco_rounded,
-                                color: const Color(0xFF2E7D32),
-                                size: 20,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Growing Conditions',
-                                style: GoogleFonts.inter(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.grey[800],
+                                    ],
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
+
+                              const SizedBox(height: 16),
+
+                              // Growing Conditions
+                              Container(
+                                padding: const EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.95),
+                                  borderRadius: BorderRadius.circular(24),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(0xFF5B4FCF).withOpacity(0.1),
+                                      blurRadius: 30,
+                                      offset: const Offset(0, 10),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFF5B4FCF).withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          child: const Icon(
+                                            Icons.eco_rounded,
+                                            color: Color(0xFF5B4FCF),
+                                            size: 20,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Text(
+                                          'Growing Conditions',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                            color: const Color(0xFF424242),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                           const SizedBox(height: 16),
                           
-                          // Direct Sunlight
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.orange[50],
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Colors.orange[200]!),
-                            ),
+                                    // Direct Sunlight
+                                    Container(
+                                      padding: const EdgeInsets.all(16),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFFFF3E0),
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: const Color(0xFFFF8F00).withOpacity(0.3),
+                                        ),
+                                      ),
                             child: Row(
                               children: [
                                 Icon(
@@ -668,7 +986,7 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
                                       _hasDirectSunlight = value;
                                     });
                                   },
-                                  activeColor: Colors.orange[600],
+                                  activeColor: const Color(0xFFFF8F00),
                                 ),
                               ],
                             ),
@@ -687,14 +1005,16 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
                           ),
                           const SizedBox(height: 8),
                           Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey[300]!),
-                              borderRadius: BorderRadius.circular(8),
-                              color: Colors.grey[50],
-                            ),
-                            child: DropdownButtonHideUnderline(
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFF5F7FA),
+                                        border: Border.all(
+                                          color: const Color(0xFF5B4FCF).withOpacity(0.1),
+                                        ),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: DropdownButtonHideUnderline(
                               child: DropdownButton<String>(
                                 value: _irrigationMethod,
                                 isExpanded: true,
@@ -728,113 +1048,198 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
                               ),
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // Notes Section
-                    Container(
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 20,
-                            offset: const Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Additional Notes',
-                            style: GoogleFonts.inter(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.grey[800],
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'The more details you provide, the better care recommendations you\'ll receive. Include soil type, location, previous treatments, observed symptoms, etc.',
-                            style: GoogleFonts.inter(
-                              fontSize: 14,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: _notesController,
-                            maxLines: 4,
-                            decoration: InputDecoration(
-                              hintText: 'e.g., Planted in sandy soil, receives morning sunlight, recently showed yellow leaves, applied fertilizer last month...',
-                              hintStyle: GoogleFonts.inter(color: Colors.grey[500]),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(color: Colors.grey[200]!),
+                                  ],
+                                ),
                               ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(color: Colors.grey[200]!),
+
+                              const SizedBox(height: 16),
+
+                              // Notes Section
+                              Container(
+                                padding: const EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.95),
+                                  borderRadius: BorderRadius.circular(24),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(0xFF5B4FCF).withOpacity(0.1),
+                                      blurRadius: 30,
+                                      offset: const Offset(0, 10),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFF5B4FCF).withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          child: const Icon(
+                                            Icons.description_rounded,
+                                            color: Color(0xFF5B4FCF),
+                                            size: 20,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Text(
+                                          'Additional Notes',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                            color: const Color(0xFF424242),
+                                          ),
+                                        ),
+                                        Text(
+                                          ' (Optional)',
+                                          style: GoogleFonts.inter(
+                                            fontSize: 14,
+                                            color: const Color(0xFF757575),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFFFF3E0),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.lightbulb_outline,
+                                            color: Color(0xFFFF8F00),
+                                            size: 16,
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: Text(
+                                              'Include soil type, location, and any symptoms for better care tips',
+                                              style: GoogleFonts.inter(
+                                                fontSize: 12,
+                                                color: const Color(0xFF795548),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    TextFormField(
+                                      controller: _notesController,
+                                      maxLines: 4,
+                                      decoration: InputDecoration(
+                                        hintText: 'e.g., Planted in sandy soil, receives morning sunlight, recently showed yellow leaves...',
+                                        hintStyle: GoogleFonts.inter(
+                                          color: const Color(0xFF9E9E9E),
+                                          fontSize: 14,
+                                        ),
+                                        filled: true,
+                                        fillColor: const Color(0xFFF5F7FA),
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                          borderSide: BorderSide.none,
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                          borderSide: BorderSide(
+                                            color: const Color(0xFF5B4FCF).withOpacity(0.1),
+                                          ),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                          borderSide: BorderSide(
+                                            color: const Color(0xFF5B4FCF).withOpacity(0.3),
+                                            width: 2,
+                                          ),
+                                        ),
+                                        contentPadding: const EdgeInsets.all(16),
+                                      ),
+                                      style: GoogleFonts.inter(fontSize: 14),
+                                    ),
+                                  ],
+                                ),
                               ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(color: Color(0xFF2E7D32)),
+
+                              const SizedBox(height: 24),
+
+                              // Save Button
+                              AnimatedContainer(
+                                duration: const Duration(milliseconds: 300),
+                                height: 56,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: _isSaving
+                                        ? [const Color(0xFF7C6FE8), const Color(0xFF9C88FF)]
+                                        : [const Color(0xFF5B4FCF), const Color(0xFF7C6FE8)],
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(16),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(0xFF5B4FCF).withOpacity(0.3),
+                                      blurRadius: 20,
+                                      offset: const Offset(0, 10),
+                                    ),
+                                  ],
+                                ),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    onTap: _isSaving ? null : _savePlant,
+                                    borderRadius: BorderRadius.circular(16),
+                                    child: Center(
+                                      child: _isSaving
+                                          ? const SizedBox(
+                                              width: 24,
+                                              height: 24,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2.5,
+                                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                              ),
+                                            )
+                                          : Row(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                const Icon(
+                                                  Icons.add_rounded,
+                                                  color: Colors.white,
+                                                  size: 24,
+                                                ),
+                                                const SizedBox(width: 12),
+                                                Text(
+                                                  'Add Plant',
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                    ),
+                                  ),
+                                ),
                               ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 16,
-                              ),
-                            ),
-                            style: GoogleFonts.inter(),
+
+                              const SizedBox(height: 20),
+                            ],
                           ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 32),
-
-                    // Save Button
-                    ElevatedButton(
-                      onPressed: _isSaving ? null : _savePlant,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2E7D32),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 18),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
                         ),
-                        elevation: 2,
                       ),
-                      child: _isSaving
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                              ),
-                            )
-                          : Text(
-                              'Add Plant',
-                              style: GoogleFonts.inter(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
                     ),
-
-                    const SizedBox(height: 20),
-                  ],
-                ),
-              ),
+              ],
             ),
-    );
+          ),
+        ),
+      );
   }
 
   Widget _buildImagePlaceholder() {
@@ -844,28 +1249,29 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFF4CAF50).withOpacity(0.1),
+            color: const Color(0xFF5B4FCF).withOpacity(0.1),
             shape: BoxShape.circle,
           ),
           child: const Icon(
             Icons.add_a_photo_rounded,
             size: 40,
-            color: Color(0xFF2E7D32),
+            color: Color(0xFF5B4FCF),
           ),
         ),
         const SizedBox(height: 12),
         Text(
           'Tap to add photos',
-          style: GoogleFonts.inter(
-            color: Colors.grey[600],
+          style: GoogleFonts.poppins(
+            color: const Color(0xFF424242),
             fontWeight: FontWeight.w500,
+            fontSize: 14,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           'Camera, Gallery, or Multiple',
           style: GoogleFonts.inter(
-            color: Colors.grey[500],
+            color: const Color(0xFF757575),
             fontSize: 12,
           ),
         ),
@@ -875,14 +1281,15 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
 
   Widget _buildImageGrid() {
     return Container(
-      constraints: const BoxConstraints(minHeight: 200),
+      constraints: const BoxConstraints(minHeight: 180),
       child: GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(8),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 3,
-          crossAxisSpacing: 8,
-          mainAxisSpacing: 8,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
           childAspectRatio: 1,
         ),
         itemCount: (_selectedImages.isNotEmpty ? _selectedImages.length : _selectedXFiles.length) + 1,
@@ -893,11 +1300,11 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
               onTap: _showImageSourceDialog,
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(8),
+                  color: const Color(0xFFF5F7FA),
+                  borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: Colors.grey[300]!,
-                    width: 2,
+                    color: const Color(0xFF5B4FCF).withOpacity(0.2),
+                    width: 1.5,
                   ),
                 ),
                 child: Column(
@@ -905,14 +1312,14 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
                   children: [
                     Icon(
                       Icons.add_rounded,
-                      color: Colors.grey[600],
+                      color: const Color(0xFF5B4FCF),
                       size: 24,
                     ),
                     const SizedBox(height: 4),
                     Text(
                       'Add More',
                       style: GoogleFonts.inter(
-                        color: Colors.grey[600],
+                        color: const Color(0xFF5B4FCF),
                         fontSize: 10,
                         fontWeight: FontWeight.w500,
                       ),

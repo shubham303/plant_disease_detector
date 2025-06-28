@@ -55,6 +55,7 @@ class _PlantScanWidgetState extends State<PlantScanWidget> with SingleTickerProv
       onImagesSelected: _onImagesSelected,
       title: 'Add Plant Images',
       allowMultiple: true,
+      primaryColor: const Color(0xFF5B4FCF),
     );
   }
 
